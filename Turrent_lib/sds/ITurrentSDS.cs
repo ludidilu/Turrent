@@ -3,8 +3,8 @@
     public interface ITurrentSDS
     {
         int GetCd();
-        int[] GetAttackRow();
-        int[] GetAttackPos();
+        int[] GetAttackTargetPos();
+        int[][] GetAttackDamagePos();
         int GetAttackGap();
         int GetAttackDamage();
     }

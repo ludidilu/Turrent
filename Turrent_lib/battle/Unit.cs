@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Turrent_lib
+﻿namespace Turrent_lib
 {
     public class Unit
     {
@@ -20,6 +17,11 @@ namespace Turrent_lib
             isMine = _isMine;
 
             sds = _sds;
+        }
+
+        internal void BeDamage(Turrent _turrent)
+        {
+            hp -= _turrent.sds.GetAttackDamage();
         }
     }
 }
