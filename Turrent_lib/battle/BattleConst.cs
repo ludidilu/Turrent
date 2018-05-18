@@ -13,5 +13,7 @@
         public const int DEFAULT_HP = 1000;
 
         public const int DEFAULT_HAND_CARDS_NUM = 5;
+
+        public const int TICK_TIME = 20;
     }
 }

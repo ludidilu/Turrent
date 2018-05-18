@@ -38,11 +38,11 @@ namespace Turrent_lib
 
         private int[] cardsArr;
 
-        private int time;
+        private int tick;
 
-        private List<KeyValuePair<int, int>> mActionList = new List<KeyValuePair<int, int>>();
+        private KeyValuePair<int, int> mAction = new KeyValuePair<int, int>(-1, -1);
 
-        private List<KeyValuePair<int, int>> oActionList = new List<KeyValuePair<int, int>>();
+        private KeyValuePair<int, int> oAction = new KeyValuePair<int, int>(-1, -1);
 
         internal void Init(int[] _mCards, int[] _oCards)
         {
@@ -114,6 +114,11 @@ namespace Turrent_lib
 
                 IUnitSDS sds = getUnitData(unitID);
 
+                if (sds.GetCost() > money)
+                {
+                    return 1;
+                }
+
                 int row = _pos % BattleConst.MAP_WIDTH;
 
                 if (Array.IndexOf(sds.GetRow(), row) != -1)
@@ -151,14 +156,7 @@ namespace Turrent_lib
                     return 3;
                 }
 
-                if (sds.GetCost() > money)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return -1;
-                }
+                return -1;
             }
             else
             {
@@ -190,6 +188,8 @@ namespace Turrent_lib
 
         private void AddUnit(bool _isMine, IUnitSDS _sds, int _pos)
         {
+            int time = tick * BattleConst.TICK_TIME;
+
             Turrent[] turrentPos = _isMine ? mTurrent : oTurrent;
 
             Unit unit = new Unit();
@@ -220,17 +220,21 @@ namespace Turrent_lib
             cardsArr[_uid] = _id;
         }
 
-        internal void Update(int _deltaTime)
+        internal void Update()
         {
-            time += _deltaTime;
+            tick++;
 
             UpdateTurrent();
 
             UpdateAction();
+
+            UpdateRecover();
         }
 
         private void UpdateTurrent()
         {
+            int time = tick * BattleConst.TICK_TIME;
+
             List<Turrent> list = new List<Turrent>();
 
             for (int i = 0; i < mTurrent.Length; i++)
@@ -265,7 +269,7 @@ namespace Turrent_lib
 
                     if (time >= turrent.time)
                     {
-                        turrent.Update(time);
+                        turrent.Update();
                     }
                     else
                     {
@@ -279,28 +283,15 @@ namespace Turrent_lib
 
         private void UpdateAction()
         {
-            List<int> delList = null;
-
-            for (int i = 0; i < mActionList.Count; i++)
+            if (mAction.Key != -1)
             {
-                KeyValuePair<int, int> pair = mActionList[i];
-
-                int result = CheckAddSummon(true, pair.Key, pair.Value);
+                int result = CheckAddSummon(true, mAction.Key, mAction.Value);
 
                 if (result < 0)
                 {
-                    AddSummon(true, pair.Key, pair.Value);
+                    AddSummon(true, mAction.Key, mAction.Value);
 
-                    if (delList == null)
-                    {
-                        delList = new List<int>();
-                    }
-
-                    delList.Add(i);
-                }
-                else if (result == 1)
-                {
-                    break;
+                    mAction = new KeyValuePair<int, int>(-1, -1);
                 }
                 else
                 {
@@ -308,58 +299,26 @@ namespace Turrent_lib
                 }
             }
 
-            if (delList != null)
+            if (oAction.Key != -1)
             {
-                int offset = 0;
-
-                for (int i = 0; i < delList.Count; i++)
-                {
-                    mActionList.RemoveAt(delList[i] + offset);
-
-                    offset--;
-                }
-
-                delList.Clear();
-            }
-
-            for (int i = 0; i < oActionList.Count; i++)
-            {
-                KeyValuePair<int, int> pair = oActionList[i];
-
-                int result = CheckAddSummon(false, pair.Key, pair.Value);
+                int result = CheckAddSummon(false, oAction.Key, oAction.Value);
 
                 if (result < 0)
                 {
-                    AddSummon(false, pair.Key, pair.Value);
+                    AddSummon(false, oAction.Key, oAction.Value);
 
-                    if (delList == null)
-                    {
-                        delList = new List<int>();
-                    }
-
-                    delList.Add(i);
-                }
-                else if (result == 1)
-                {
-                    break;
+                    oAction = new KeyValuePair<int, int>(-1, -1);
                 }
                 else
                 {
                     throw new Exception("o summon error");
                 }
             }
+        }
 
-            if (delList != null)
-            {
-                int offset = 0;
+        private void UpdateRecover()
+        {
 
-                for (int i = 0; i < delList.Count; i++)
-                {
-                    oActionList.RemoveAt(delList[i] + offset);
-
-                    offset--;
-                }
-            }
         }
 
         internal void BaseBeDamage(Turrent _turrent)

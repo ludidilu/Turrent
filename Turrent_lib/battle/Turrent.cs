@@ -35,7 +35,7 @@
             time = _time + sds.GetCd();
         }
 
-        internal void Update(int _deltaTime)
+        internal void Update()
         {
             if (state == TurrentState.CD)
             {
@@ -44,7 +44,7 @@
 
             Attack();
 
-            time += sds.GetAttackGap() - (_deltaTime - time);
+            time += sds.GetAttackGap();
         }
 
         private void Attack()

@@ -56,8 +56,12 @@
   <ItemGroup>
     <Compile Include="battle\BattleConst.cs" />
     <Compile Include="battle\BattleCore.cs" />
+    <Compile Include="battle\BattlePublicTools.cs" />
     <Compile Include="battle\Turrent.cs" />
     <Compile Include="battle\Unit.cs" />
+    <Compile Include="battle_client\BattleClient.cs" />
+    <Compile Include="battle_server\BattleServer.cs" />
+    <Compile Include="log\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="sds\ITurrentSDS.cs" />
     <Compile Include="sds\IUnitSDS.cs" />
