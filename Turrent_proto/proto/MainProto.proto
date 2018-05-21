@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+enum PlayerStateEnum {
+    Free = 0;
+    Searching = 1;
+    Battle = 2;
+}
+
+message LoginMessage {
+    string Name = 1;
+}
+
+message PlayerStateMessage {
+    PlayerStateEnum PlayerState = 1;
+}
+
+enum BattleManagerActionEnum {
+    Pvp = 0;
+    Pve = 1;
+    CancelSearching = 2;
+}
+
+message BattleManagerActionMessage {
+    BattleManagerActionEnum BattleManagerAction = 1;
+    int32 BattleId = 2;
+}
+

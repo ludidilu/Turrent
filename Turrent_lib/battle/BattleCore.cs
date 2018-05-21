@@ -10,11 +10,17 @@ namespace Turrent_lib
 
         public static Func<int, ITurrentSDS> getTurrentData;
 
-        public static void Init(Func<int, IUnitSDS> _getUnitData, Func<int, ITurrentSDS> _getTurrentData)
+        public static void Init<T, U>(Dictionary<int, T> _unitDic, Dictionary<int, U> _turrentDic) where T : IUnitSDS where U : ITurrentSDS
         {
-            getUnitData = _getUnitData;
+            getUnitData = delegate (int _id)
+            {
+                return _unitDic[_id];
+            };
 
-            getTurrentData = _getTurrentData;
+            getTurrentData = delegate (int _id)
+            {
+                return _turrentDic[_id];
+            };
         }
 
         internal Turrent[] mTurrent = new Turrent[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
