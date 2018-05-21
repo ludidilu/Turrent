@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Turrent_lib
@@ -10,7 +9,32 @@ namespace Turrent_lib
 
         private bool serverProcessBattle;
 
-        public void RefreshData(BinaryReader _br)
+        private Action<MemoryStream, Action<BinaryReader>> clientSendDataCallBack;
+
+        private Action clientRefreshDataCallBack;
+
+        public void Init(Action<MemoryStream, Action<BinaryReader>> _clientSendDataCallBack, Action _clientRefreshDataCallBack)
+        {
+            clientSendDataCallBack = _clientSendDataCallBack;
+
+            clientRefreshDataCallBack = _clientRefreshDataCallBack;
+        }
+
+        public void ClientGetPackage(BinaryReader _br)
+        {
+            byte tag = _br.ReadByte();
+
+            switch (tag)
+            {
+                case PackageTag.S2C_UPDATE:
+
+                    ClientUpdate(_br);
+
+                    break;
+            }
+        }
+
+        private void RefreshData(BinaryReader _br)
         {
             clientIsMine = _br.ReadBoolean();
 
@@ -68,9 +92,11 @@ namespace Turrent_lib
             {
                 Update();
             }
+
+            clientRefreshDataCallBack();
         }
 
-        public void ClientUpdate(BinaryReader _br)
+        private void ClientUpdate(BinaryReader _br)
         {
             int nowTick = _br.ReadInt32();
 
@@ -81,29 +107,57 @@ namespace Turrent_lib
 
             int num = _br.ReadInt32();
 
-            for (int i = 0; i < num; i++)
+            if (num > 0)
             {
-                bool isMine = _br.ReadBoolean();
+                for (int i = 0; i < num; i++)
+                {
+                    bool isMine = _br.ReadBoolean();
 
-                int uid = _br.ReadInt32();
+                    int uid = _br.ReadInt32();
 
-                int pos = _br.ReadInt32();
+                    int pos = _br.ReadInt32();
 
-                AddAction(isMine, uid, pos);
-            }
+                    AddAction(isMine, uid, pos);
+                }
 
-            num = _br.ReadInt32();
+                num = _br.ReadInt32();
 
-            for (int i = 0; i < num; i++)
-            {
-                int uid = _br.ReadInt32();
+                for (int i = 0; i < num; i++)
+                {
+                    int uid = _br.ReadInt32();
 
-                int id = _br.ReadInt32();
+                    int id = _br.ReadInt32();
 
-                SetCard(uid, id);
+                    SetCard(uid, id);
+                }
             }
 
             Update();
+        }
+
+        public int ClientRequestAddAction(int _uid, int _pos)
+        {
+            int result = CheckAddSummon(clientIsMine, _uid, _pos);
+
+            if (result == -1)
+            {
+                AddAction(clientIsMine, _uid, _pos);
+            }
+
+            return result;
+        }
+
+        public void ClientRequestRefreshData()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (BinaryWriter bw = new BinaryWriter(ms))
+                {
+                    bw.Write(PackageTag.C2S_REFRESH);
+
+                    clientSendDataCallBack(ms, RefreshData);
+                }
+            }
         }
     }
 }

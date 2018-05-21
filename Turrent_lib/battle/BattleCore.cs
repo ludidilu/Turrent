@@ -37,7 +37,7 @@ namespace Turrent_lib
 
         internal Queue<int> oCards = new Queue<int>();
 
-        private int[] cardsArr;
+        private int[] cardsArr = new int[BattleConst.DECK_CARD_NUM * 2];
 
         protected int tick;
 
@@ -45,7 +45,7 @@ namespace Turrent_lib
 
         internal void Init(int[] _mCards, int[] _oCards)
         {
-            cardsArr = new int[BattleConst.DECK_CARD_NUM * 2];
+            Reset();
 
             mMoney = oMoney = BattleConst.DEFAULT_MONEY;
 
@@ -80,7 +80,7 @@ namespace Turrent_lib
             }
         }
 
-        private int CheckAddSummon(bool _isMine, int _uid, int _pos)
+        protected int CheckAddSummon(bool _isMine, int _uid, int _pos)
         {
             List<int> handCards;
 
@@ -340,6 +340,31 @@ namespace Turrent_lib
         internal void AddAction(bool _isMine, int _uid, int _pos)
         {
             actionList.Add(new Tuple<bool, int, int>(_isMine, _uid, _pos));
+        }
+
+        private void Reset()
+        {
+            mHandCards.Clear();
+
+            oHandCards.Clear();
+
+            mCards.Clear();
+
+            oCards.Clear();
+
+            actionList.Clear();
+
+            for (int i = 0; i < cardsArr.Length; i++)
+            {
+                cardsArr[i] = 0;
+            }
+
+            for (int i = 0; i < mTurrent.Length; i++)
+            {
+                mTurrent[i] = null;
+
+                oTurrent[i] = null;
+            }
         }
     }
 }

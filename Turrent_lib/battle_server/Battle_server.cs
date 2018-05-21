@@ -12,35 +12,35 @@ namespace Turrent_lib
         {
             public bool isMine;
 
-            public int key;
+            public int uid;
 
-            public int value;
+            public int pos;
 
-            public PlayerAction(bool _isMine, int _key, int _value)
+            public PlayerAction(bool _isMine, int _uid, int _pos)
             {
                 isMine = _isMine;
 
-                key = _key;
+                uid = _uid;
 
-                value = _value;
+                pos = _pos;
             }
 
             public void Write(BinaryWriter _bw)
             {
                 _bw.Write(isMine);
 
-                _bw.Write(key);
+                _bw.Write(uid);
 
-                _bw.Write(value);
+                _bw.Write(pos);
             }
 
             public void Read(BinaryReader _br)
             {
                 isMine = _br.ReadBoolean();
 
-                key = _br.ReadInt32();
+                uid = _br.ReadInt32();
 
-                value = _br.ReadInt32();
+                pos = _br.ReadInt32();
             }
         }
 
@@ -88,6 +88,8 @@ namespace Turrent_lib
         public void ServerStart(int _battleInitDataID, IList<int> _mCards, IList<int> _oCards, bool _isVsAi)
         {
             Log.Write("Battle Start!");
+
+            Reset();
 
             recordData = new BattleRecordData();
 
@@ -266,6 +268,10 @@ namespace Turrent_lib
                 {
                     using (BinaryWriter mBw = new BinaryWriter(mMs), oBw = new BinaryWriter(oMs))
                     {
+                        mBw.Write(PackageTag.S2C_UPDATE);
+
+                        oBw.Write(PackageTag.S2C_UPDATE);
+
                         mBw.Write(tick);
 
                         oBw.Write(tick);
@@ -288,9 +294,9 @@ namespace Turrent_lib
 
                             if (action.isMine)
                             {
-                                oList.Add(action.key);
+                                oList.Add(action.uid);
 
-                                oCardsShowList.Add(action.key);
+                                oCardsShowList.Add(action.uid);
 
                                 if (recordData.mCards.Length > mCardsShowNum)
                                 {
@@ -301,9 +307,9 @@ namespace Turrent_lib
                             }
                             else
                             {
-                                mList.Add(action.key);
+                                mList.Add(action.uid);
 
-                                mCardsShowList.Add(action.key);
+                                mCardsShowList.Add(action.uid);
 
                                 if (recordData.oCards.Length > oCardsShowNum)
                                 {
@@ -348,6 +354,8 @@ namespace Turrent_lib
                 {
                     using (BinaryWriter bw = new BinaryWriter(ms))
                     {
+                        bw.Write(PackageTag.S2C_UPDATE);
+
                         bw.Write(tick);
 
                         bw.Write(0);
@@ -367,7 +375,20 @@ namespace Turrent_lib
             }
         }
 
+        private void Reset()
+        {
+            tick = 0;
 
+            mCardsShowNum = 0;
+
+            oCardsShowNum = 0;
+
+            mCardsShowList.Clear();
+
+            oCardsShowList.Clear();
+
+            recordData = null;
+        }
 
 
 
