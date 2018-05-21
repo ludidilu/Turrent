@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using tuple;
 
 namespace Turrent_lib
 {
@@ -38,11 +39,9 @@ namespace Turrent_lib
 
         private int[] cardsArr;
 
-        private int tick;
+        protected int tick;
 
-        private KeyValuePair<int, int> mAction = new KeyValuePair<int, int>(-1, -1);
-
-        private KeyValuePair<int, int> oAction = new KeyValuePair<int, int>(-1, -1);
+        private List<Tuple<bool, int, int>> actionList = new List<Tuple<bool, int, int>>();
 
         internal void Init(int[] _mCards, int[] _oCards)
         {
@@ -215,7 +214,7 @@ namespace Turrent_lib
             return cardsArr[_uid];
         }
 
-        private void SetCard(int _uid, int _id)
+        protected void SetCard(int _uid, int _id)
         {
             cardsArr[_uid] = _id;
         }
@@ -283,36 +282,25 @@ namespace Turrent_lib
 
         private void UpdateAction()
         {
-            if (mAction.Key != -1)
+            if (actionList.Count > 0)
             {
-                int result = CheckAddSummon(true, mAction.Key, mAction.Value);
-
-                if (result < 0)
+                for (int i = 0; i < actionList.Count; i++)
                 {
-                    AddSummon(true, mAction.Key, mAction.Value);
+                    Tuple<bool, int, int> t = actionList[i];
 
-                    mAction = new KeyValuePair<int, int>(-1, -1);
-                }
-                else
-                {
-                    throw new Exception("m summon error");
-                }
-            }
+                    int result = CheckAddSummon(t.first, t.second, t.third);
 
-            if (oAction.Key != -1)
-            {
-                int result = CheckAddSummon(false, oAction.Key, oAction.Value);
-
-                if (result < 0)
-                {
-                    AddSummon(false, oAction.Key, oAction.Value);
-
-                    oAction = new KeyValuePair<int, int>(-1, -1);
+                    if (result < 0)
+                    {
+                        AddSummon(t.first, t.second, t.third);
+                    }
+                    else
+                    {
+                        throw new Exception("m summon error");
+                    }
                 }
-                else
-                {
-                    throw new Exception("o summon error");
-                }
+
+                actionList.Clear();
             }
         }
 
@@ -347,6 +335,11 @@ namespace Turrent_lib
             {
                 return 0;
             }
+        }
+
+        internal void AddAction(bool _isMine, int _uid, int _pos)
+        {
+            actionList.Add(new Tuple<bool, int, int>(_isMine, _uid, _pos));
         }
     }
 }

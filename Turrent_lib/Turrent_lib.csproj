@@ -59,8 +59,8 @@
     <Compile Include="battle\BattlePublicTools.cs" />
     <Compile Include="battle\Turrent.cs" />
     <Compile Include="battle\Unit.cs" />
-    <Compile Include="battle_client\BattleClient.cs" />
-    <Compile Include="battle_server\BattleServer.cs" />
+    <Compile Include="battle_client\Battle_client.cs" />
+    <Compile Include="battle_server\Battle_server.cs" />
     <Compile Include="log\Log.cs" />
     <Compile Include="packageTag\PackageTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
