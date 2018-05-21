@@ -55,12 +55,18 @@
     <Reference Include="Connection">
       <HintPath>..\..\Connection\bin\x64\Debug\Connection.dll</HintPath>
     </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>..\Turrent_proto\libs\Google.Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="Turrent_lib">
       <HintPath>..\Turrent_lib\bin\x64\Debug\Turrent_lib.dll</HintPath>
+    </Reference>
+    <Reference Include="Turrent_proto">
+      <HintPath>..\Turrent_proto\bin\x64\Debug\Turrent_proto.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

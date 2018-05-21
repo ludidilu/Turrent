@@ -17,9 +17,9 @@ namespace Turrent_server
 
             ResourceLoad();
 
-            PlayerUnitManager.Instance = new PlayerUnitManager();
+            //PlayerUnitManager.Instance = new PlayerUnitManager();
 
-            BattleManager.Instance = new BattleManager();
+            //BattleManager.Instance = new BattleManager();
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
@@ -33,7 +33,7 @@ namespace Turrent_server
             {
                 long t0 = watch.ElapsedMilliseconds;
 
-                BattleManager.Instance.Process(UpdateBattleManager);
+                //BattleManager.Instance.Process(UpdateBattleManager);
 
                 long t1 = watch.ElapsedMilliseconds;
 
