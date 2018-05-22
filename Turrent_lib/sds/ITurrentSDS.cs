@@ -1,10 +1,12 @@
-﻿namespace Turrent_lib
+﻿using System.Collections.Generic;
+
+namespace Turrent_lib
 {
     public interface ITurrentSDS
     {
         int GetCd();
-        int[] GetAttackTargetPos();
-        int[][] GetAttackDamagePos();
+        KeyValuePair<int, int>[] GetAttackTargetPos();
+        KeyValuePair<int, int>[][] GetAttackDamagePos();
         int GetAttackGap();
         int GetAttackDamage();
     }

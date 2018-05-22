@@ -1,30 +1,46 @@
-﻿using Turrent_lib;
+﻿using System.Collections.Generic;
+using Turrent_lib;
 
 public partial class TurrentSDS : CsvBase, ITurrentSDS
 {
     public int cd;
-    public int[] attackTargetPos;
+    public string[] attackTargetPos;
     public string[] attackDamagePos;
     public int attackGap;
     public int attackDamage;
 
-    private int[][] attackDamagePosFix;
+    private KeyValuePair<int, int>[] attackTargetPosFix;
+    private KeyValuePair<int, int>[][] attackDamagePosFix;
 
     public int GetCd()
     {
         return cd;
     }
 
-    public int[] GetAttackTargetPos()
+    public KeyValuePair<int, int>[] GetAttackTargetPos()
     {
-        return attackTargetPos;
+        if (attackTargetPosFix == null)
+        {
+            attackTargetPosFix = new KeyValuePair<int, int>[attackTargetPos.Length];
+
+            for (int i = 0; i < attackTargetPos.Length; i++)
+            {
+                string str = attackTargetPos[i];
+
+                string[] strArr = str.Split(':');
+
+                attackTargetPosFix[i] = new KeyValuePair<int, int>(int.Parse(strArr[0]), int.Parse(strArr[1]));
+            }
+        }
+
+        return attackTargetPosFix;
     }
 
-    public int[][] GetAttackDamagePos()
+    public KeyValuePair<int, int>[][] GetAttackDamagePos()
     {
         if (attackDamagePosFix == null)
         {
-            attackDamagePosFix = new int[attackDamagePos.Length][];
+            attackDamagePosFix = new KeyValuePair<int, int>[attackDamagePos.Length][];
 
             for (int i = 0; i < attackDamagePos.Length; i++)
             {
@@ -32,11 +48,15 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
 
                 string[] strArr = str.Split('&');
 
-                int[] arr = new int[strArr.Length];
+                KeyValuePair<int, int>[] arr = new KeyValuePair<int, int>[strArr.Length];
 
                 for (int m = 0; m < strArr.Length; m++)
                 {
-                    arr[m] = int.Parse(strArr[m]);
+                    string str2 = strArr[m];
+
+                    string[] strArr2 = str2.Split(':');
+
+                    arr[m] = new KeyValuePair<int, int>(int.Parse(strArr2[0]), int.Parse(strArr2[1]));
                 }
 
                 attackDamagePosFix[i] = arr;

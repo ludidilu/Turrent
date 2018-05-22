@@ -8,6 +8,9 @@ public class BattleUnit : MonoBehaviour
     private const string TEXT_FIX = "{0}  {1}/{2}";
 
     [SerializeField]
+    private float sizeFix = 10;
+
+    [SerializeField]
     private Text text;
 
     [SerializeField]
@@ -17,15 +20,23 @@ public class BattleUnit : MonoBehaviour
 
     private List<Turrent> list;
 
-    public void Init(List<Turrent> _list)
+    private bool isMine;
+
+    public int unitWidth;
+
+    public int unitHeight;
+
+    public void Init(bool _isMine, List<Turrent> _list)
     {
+        isMine = _isMine;
+
         list = _list;
 
         sds = list[0].parent.sds as UnitSDS;
 
-        int unitWidth = 0;
+        unitWidth = 0;
 
-        int unitHeight = 0;
+        unitHeight = 0;
 
         for (int i = 0; i < sds.pos.Length; i++)
         {
@@ -54,7 +65,7 @@ public class BattleUnit : MonoBehaviour
 
         float width = screenWidth / BattleConst.MAP_WIDTH;
 
-        (transform as RectTransform).sizeDelta = new Vector2(width * unitWidth, width * unitHeight);
+        (transform as RectTransform).sizeDelta = new Vector2(width * unitWidth - sizeFix, width * unitHeight - sizeFix);
     }
 
     public void Refresh()

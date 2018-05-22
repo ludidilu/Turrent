@@ -1,4 +1,6 @@
-﻿namespace Turrent_lib
+﻿using System.Collections.Generic;
+
+namespace Turrent_lib
 {
     enum TurrentState
     {
@@ -57,34 +59,51 @@
 
             for (int i = 0; i < sds.GetAttackTargetPos().Length; i++)
             {
-                int targetPos = oppX + sds.GetAttackTargetPos()[i];
+                KeyValuePair<int, int> targetPosFix = sds.GetAttackTargetPos()[i];
 
-                if (targetPos < 0)
+                int targetX = oppX + targetPosFix.Key;
+
+                if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
                 {
-                    battleCore.BaseBeDamage(this);
+                    continue;
                 }
-                else
+
+                int targetY = targetPosFix.Value;
+
+                int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
+
+                if (oppTurrent[targetPos] != null)
                 {
-                    if (oppTurrent[targetPos] != null)
+                    KeyValuePair<int, int>[] arr = sds.GetAttackDamagePos()[i];
+
+                    for (int m = 0; m < arr.Length; m++)
                     {
-                        int[] arr = sds.GetAttackDamagePos()[i];
+                        KeyValuePair<int, int> damagePosFix = arr[m];
 
-                        for (int m = 0; m < arr.Length; m++)
+                        int damageX = oppX + damagePosFix.Key;
+
+                        if (damageX >= BattleConst.MAP_WIDTH || damageX < 0)
                         {
-                            int damagePos = oppX + arr[m];
-
-                            Turrent damageTurrent = oppTurrent[damagePos];
-
-                            if (damageTurrent != null)
-                            {
-                                damageTurrent.parent.BeDamage(this);
-                            }
+                            continue;
                         }
 
-                        break;
+                        int damageY = damagePosFix.Value;
+
+                        int damagePos = damageY * BattleConst.MAP_WIDTH + damageX;
+
+                        Turrent damageTurrent = oppTurrent[damagePos];
+
+                        if (damageTurrent != null)
+                        {
+                            damageTurrent.parent.BeDamage(this);
+                        }
                     }
+
+                    return;
                 }
             }
+
+            battleCore.BaseBeDamage(this);
         }
     }
 }

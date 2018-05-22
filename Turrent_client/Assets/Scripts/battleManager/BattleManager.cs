@@ -259,5 +259,35 @@ public partial class BattleManager : MonoBehaviour
                 }
             }
         }
+
+        IEnumerator<List<Turrent>> ee = dic.Values.GetEnumerator();
+
+        while (ee.MoveNext())
+        {
+            BattleUnit unit = Instantiate(unitRes);
+
+            unit.Init(true, ee.Current);
+
+            unit.gameObject.SetActive(true);
+
+            unit.transform.SetParent(transform, false);
+
+            (unit.transform as RectTransform).anchoredPosition = new Vector2();
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            List<int> handCards = battle.GetHandCards();
+
+            if (handCards.Count > 0)
+            {
+                int uid = handCards[0];
+
+                battle.ClientRequestAddAction(uid, 0);
+            }
+        }
     }
 }

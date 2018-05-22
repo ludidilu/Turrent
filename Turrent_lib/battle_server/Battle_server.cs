@@ -227,6 +227,8 @@ namespace Turrent_lib
 
             int pos = _br.ReadInt32();
 
+            Log.Write("ServerDoAction:" + uid + "    " + pos);
+
             if (_isMine && uid >= BattleConst.DECK_CARD_NUM)
             {
                 throw new Exception("ServerDoAction error0");
@@ -313,7 +315,7 @@ namespace Turrent_lib
 
                                 if (recordData.oCards.Length > oCardsShowNum)
                                 {
-                                    oList.Add(oCardsShowNum);
+                                    oList.Add(oCardsShowNum + BattleConst.DECK_CARD_NUM);
 
                                     oCardsShowNum++;
                                 }
@@ -328,7 +330,14 @@ namespace Turrent_lib
 
                             mBw.Write(uid);
 
-                            mBw.Write(recordData.mCards[uid]);
+                            if (uid < BattleConst.DECK_CARD_NUM)
+                            {
+                                mBw.Write(recordData.mCards[uid]);
+                            }
+                            else
+                            {
+                                mBw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
+                            }
                         }
 
                         oBw.Write(oList.Count);
@@ -337,9 +346,16 @@ namespace Turrent_lib
                         {
                             int uid = oList[i];
 
-                            oBw.Write(uid + BattleConst.DECK_CARD_NUM);
+                            oBw.Write(uid);
 
-                            oBw.Write(recordData.oCards[uid]);
+                            if (uid < BattleConst.DECK_CARD_NUM)
+                            {
+                                oBw.Write(recordData.mCards[uid]);
+                            }
+                            else
+                            {
+                                oBw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
+                            }
                         }
 
                         serverSendDataCallBack(true, true, mMs);

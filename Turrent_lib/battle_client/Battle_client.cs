@@ -142,10 +142,27 @@ namespace Turrent_lib
 
             if (result == -1)
             {
-                AddAction(clientIsMine, _uid, _pos);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (BinaryWriter bw = new BinaryWriter(ms))
+                    {
+                        bw.Write(PackageTag.C2S_DOACTION);
+
+                        bw.Write(_uid);
+
+                        bw.Write(_pos);
+
+                        clientSendDataCallBack(ms, GetAddActionResult);
+                    }
+                }
             }
 
             return result;
+        }
+
+        private void GetAddActionResult(BinaryReader _br)
+        {
+
         }
 
         public void ClientRequestRefreshData()

@@ -17,6 +17,8 @@ internal class BattleManager
 
     private Dictionary<int, BattleUnit> battleDic = new Dictionary<int, BattleUnit>();
 
+    private List<BattleUnit> battleList = new List<BattleUnit>();
+
     private int lastPlayer = -1;
 
     internal void Login(int _playerUnit)
@@ -124,6 +126,8 @@ internal class BattleManager
                 {
                     battleUnit = GetBattleUnit(processBattle);
 
+                    battleList.Add(battleUnit);
+
                     int tmpPlayer = lastPlayer;
 
                     lastPlayer = -1;
@@ -153,6 +157,8 @@ internal class BattleManager
                 int battleID = _message.BattleId;
 
                 battleUnit = GetBattleUnit(processBattle);
+
+                battleList.Add(battleUnit);
 
                 battleDic.Add(_playerUnit, battleUnit);
 
@@ -253,11 +259,9 @@ internal class BattleManager
 
     internal void Update()
     {
-        IEnumerator<BattleUnit> enumerator = battleDic.Values.GetEnumerator();
-
-        while (enumerator.MoveNext())
+        for (int i = 0; i < battleList.Count; i++)
         {
-            enumerator.Current.Update();
+            battleList[i].Update();
         }
     }
 }

@@ -18,7 +18,7 @@ public class Main : MonoBehaviour
     {
         Application.targetFrameRate = 60;
 
-        Turrent_lib.Log.Init(Debug.Log);
+        //Turrent_lib.Log.Init(Debug.Log);
 
         Connection.Log.Init(Debug.Log);
 
