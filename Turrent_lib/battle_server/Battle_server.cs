@@ -85,7 +85,7 @@ namespace Turrent_lib
             serverSendDataCallBack = _serverSendDataCallBack;
         }
 
-        public void ServerStart(int _battleInitDataID, IList<int> _mCards, IList<int> _oCards, bool _isVsAi)
+        public void ServerStart(IList<int> _mCards, IList<int> _oCards, bool _isVsAi)
         {
             Log.Write("Battle Start!");
 
@@ -258,7 +258,7 @@ namespace Turrent_lib
 
         }
 
-        internal void ServerUpdate()
+        public void ServerUpdate()
         {
             List<PlayerAction> list;
 

@@ -17,9 +17,9 @@ namespace Turrent_server
 
             ResourceLoad();
 
-            //PlayerUnitManager.Instance = new PlayerUnitManager();
+            PlayerUnitManager.Instance = new PlayerUnitManager();
 
-            //BattleManager.Instance = new BattleManager();
+            BattleManager.Instance = new BattleManager();
 
             Server<PlayerUnit> server = new Server<PlayerUnit>();
 
@@ -33,7 +33,9 @@ namespace Turrent_server
             {
                 long t0 = watch.ElapsedMilliseconds;
 
-                //BattleManager.Instance.Process(UpdateBattleManager);
+                server.Update();
+
+                BattleManager.Instance.Update();
 
                 long t1 = watch.ElapsedMilliseconds;
 
@@ -57,6 +59,8 @@ namespace Turrent_server
             StaticData.Load<TurrentSDS>("Turrent");
 
             StaticData.Load<UnitSDS>("Unit");
+
+            StaticData.Load<BattleSDS>("Battle");
 
             Dictionary<int, TurrentSDS> turrendDic = StaticData.GetDic<TurrentSDS>();
 
