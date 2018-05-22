@@ -27,6 +27,8 @@ public class BattleView : UIPanel
         {
             GameObject go = GameObjectFactory.Instance.GetGameObject("Assets/Resource/prefab/battle/BattleManager.prefab", null);
 
+            go.transform.SetParent(transform, false);
+
             battleManager = go.GetComponent<BattleManager>();
 
             battleManager.Init(battleManagerEventGo);
@@ -34,7 +36,7 @@ public class BattleView : UIPanel
             SuperFunction.Instance.AddEventListener(battleManagerEventGo, BattleManager.BATTLE_QUIT, BattleQuit);
         }
 
-        battleManager.RequestRefreshData();
+        battleManager.StartBattle();
     }
 
     private void BattleQuit(int _index)

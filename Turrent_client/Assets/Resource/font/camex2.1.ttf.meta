@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 993eb054934bcb849b04581a428e692a
+timeCreated: 1526967750
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: camex2.1
+  fontNames:
+  - camex2.1
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

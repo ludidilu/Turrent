@@ -30,7 +30,7 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
             {
                 string str = attackDamagePos[i];
 
-                string[] strArr = str.Split('$');
+                string[] strArr = str.Split('&');
 
                 int[] arr = new int[strArr.Length];
 

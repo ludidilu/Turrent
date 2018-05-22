@@ -1,3 +1,4 @@
 编号,可以放置的排,占用位置,炮台编号(对应占用位置),生命值,花费
 int,int[],int[],int[],int,int
 ID,row,pos,turrent,hp,cost
+1,0$1,0,1,100,5
