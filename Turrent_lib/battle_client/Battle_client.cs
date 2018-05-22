@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Turrent_lib
@@ -158,6 +159,21 @@ namespace Turrent_lib
                     clientSendDataCallBack(ms, RefreshData);
                 }
             }
+        }
+
+        public List<int> GetHandCards()
+        {
+            return clientIsMine ? mHandCards : oHandCards;
+        }
+
+        public Turrent[] GetMyTurrent()
+        {
+            return clientIsMine ? mTurrent : oTurrent;
+        }
+
+        public Turrent[] GetOppTurrent()
+        {
+            return clientIsMine ? oTurrent : mTurrent;
         }
     }
 }

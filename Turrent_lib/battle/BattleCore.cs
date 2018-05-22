@@ -215,7 +215,7 @@ namespace Turrent_lib
             }
         }
 
-        private int GetCard(int _uid)
+        public int GetCard(int _uid)
         {
             return cardsArr[_uid];
         }
