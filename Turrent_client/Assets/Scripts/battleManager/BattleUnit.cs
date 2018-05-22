@@ -66,6 +66,8 @@ public class BattleUnit : MonoBehaviour
         float width = screenWidth / BattleConst.MAP_WIDTH;
 
         (transform as RectTransform).sizeDelta = new Vector2(width * unitWidth - sizeFix, width * unitHeight - sizeFix);
+
+        Refresh();
     }
 
     public void Refresh()

@@ -1,4 +1,4 @@
 编号,冷却时间,攻击时选择位置,攻击时伤害位置(对应attackTargetPos),攻击间隔,攻击伤害
 int,int,string[],string[],int,int
 ID,cd,attackTargetPos,attackDamagePos,attackGap,attackDamage
-1,1000,0:0$0:1,0:0$0:1,10000,1
+1,1000,0:0$0:1,0:0&-1:0&1:0$0:1&-1:1&1:1,10000,1
