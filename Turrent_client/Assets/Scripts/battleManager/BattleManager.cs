@@ -367,7 +367,9 @@ public partial class BattleManager : MonoBehaviour
             {
                 int uid = handCards[0];
 
-                battle.ClientRequestAddAction(uid, 0);
+                int result = battle.ClientRequestAddAction(uid, 2);
+
+                Debug.Log("result:" + result);
             }
         }
         else if (Input.GetKeyUp(KeyCode.F5))
@@ -390,6 +392,27 @@ public partial class BattleManager : MonoBehaviour
         if (needRefresh)
         {
             RefreshData();
+        }
+
+        if (battle.clientIsMine)
+        {
+            mHp.text = battle.mBase.ToString();
+
+            oHp.text = battle.oBase.ToString();
+
+            mMoney.text = battle.mMoney.ToString();
+
+            oMoney.text = battle.oMoney.ToString();
+        }
+        else
+        {
+            mHp.text = battle.oBase.ToString();
+
+            oHp.text = battle.mBase.ToString();
+
+            mMoney.text = battle.oMoney.ToString();
+
+            oMoney.text = battle.mMoney.ToString();
         }
     }
 }

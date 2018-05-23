@@ -15,5 +15,9 @@
         public const int DEFAULT_HAND_CARDS_NUM = 5;
 
         public const int TICK_TIME = 20;
+
+        public const int MAX_MONEY = 10;
+
+        public const int RECOVER_MONEY_TIME = 2000;
     }
 }

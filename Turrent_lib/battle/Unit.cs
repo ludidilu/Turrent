@@ -6,17 +6,19 @@
 
         public IUnitSDS sds;
 
-        public int hp;
+        public int hp { private set; get; }
 
         private BattleCore battleCore;
 
-        public void Init(BattleCore _battleCore, bool _isMine, IUnitSDS _sds, int _pos)
+        public void Init(BattleCore _battleCore, bool _isMine, IUnitSDS _sds)
         {
             battleCore = _battleCore;
 
             isMine = _isMine;
 
             sds = _sds;
+
+            hp = sds.GetHp();
         }
 
         internal int BeDamage(Turrent _turrent)

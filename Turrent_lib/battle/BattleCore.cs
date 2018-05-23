@@ -28,13 +28,17 @@ namespace Turrent_lib
 
         internal Turrent[] oTurrent = new Turrent[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
-        internal int mBase;
+        public int mBase { private set; get; }
 
-        internal int oBase;
+        public int oBase { private set; get; }
 
-        internal int mMoney;
+        public int mMoney { private set; get; }
 
-        internal int oMoney;
+        public int oMoney { private set; get; }
+
+        private int mMoneyTime;
+
+        private int oMoneyTime;
 
         internal List<int> mHandCards = new List<int>();
 
@@ -57,6 +61,8 @@ namespace Turrent_lib
             Reset();
 
             mMoney = oMoney = BattleConst.DEFAULT_MONEY;
+
+            mBase = oBase = BattleConst.DEFAULT_HP;
 
             for (int i = 0; i < BattleConst.DECK_CARD_NUM && i < _mCards.Length; i++)
             {
@@ -125,18 +131,11 @@ namespace Turrent_lib
                     return 1;
                 }
 
-                int row = _pos % BattleConst.MAP_WIDTH;
+                int row = _pos / BattleConst.MAP_WIDTH;
 
                 if (Array.IndexOf(sds.GetRow(), row) != -1)
                 {
                     int x = _pos % BattleConst.MAP_WIDTH;
-
-                    int y = _pos / BattleConst.MAP_WIDTH;
-
-                    if (Array.IndexOf(sds.GetRow(), y) == -1)
-                    {
-                        return 5;
-                    }
 
                     for (int i = 0; i < sds.GetPos().Length; i++)
                     {
@@ -172,18 +171,30 @@ namespace Turrent_lib
 
         private BattleSummonVO AddSummon(bool _isMine, int _uid, int _pos)
         {
+            int time = tick * BattleConst.TICK_TIME;
+
             int unitID = GetCard(_isMine, _uid);
 
             IUnitSDS sds = getUnitData(unitID);
 
             if (_isMine)
             {
+                if (mMoney == BattleConst.MAX_MONEY)
+                {
+                    mMoneyTime = time + BattleConst.RECOVER_MONEY_TIME;
+                }
+
                 mMoney -= sds.GetCost();
 
                 mHandCards.Remove(_uid);
             }
             else
             {
+                if (oMoney == BattleConst.MAX_MONEY)
+                {
+                    oMoneyTime = time + BattleConst.RECOVER_MONEY_TIME;
+                }
+
                 oMoney -= sds.GetCost();
 
                 oHandCards.Remove(_uid);
@@ -202,7 +213,7 @@ namespace Turrent_lib
 
             Unit unit = new Unit();
 
-            unit.Init(this, _isMine, _sds, _pos);
+            unit.Init(this, _isMine, _sds);
 
             for (int i = 0; i < _sds.GetPos().Length; i++)
             {
@@ -212,7 +223,7 @@ namespace Turrent_lib
 
                 Turrent turrent = new Turrent();
 
-                turrent.Init(this, unit, sds, pos, time);
+                turrent.Init(this, unit, sds, _pos + pos, time);
 
                 turrentPos[pos] = turrent;
             }
@@ -329,7 +340,21 @@ namespace Turrent_lib
 
         private void UpdateRecover()
         {
+            int time = tick * BattleConst.TICK_TIME;
 
+            while (mMoney < BattleConst.MAX_MONEY && time >= mMoneyTime)
+            {
+                mMoney++;
+
+                mMoneyTime += BattleConst.RECOVER_MONEY_TIME;
+            }
+
+            while (oMoney < BattleConst.MAX_MONEY && time >= oMoneyTime)
+            {
+                oMoney++;
+
+                oMoneyTime += BattleConst.RECOVER_MONEY_TIME;
+            }
         }
 
         internal int BaseBeDamage(Turrent _turrent)
@@ -394,6 +419,10 @@ namespace Turrent_lib
             }
 
             tick = 0;
+
+            mMoneyTime = 0;
+
+            oMoneyTime = 0;
         }
     }
 }

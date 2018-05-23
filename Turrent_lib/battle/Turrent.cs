@@ -54,7 +54,7 @@ namespace Turrent_lib
         {
             int x = pos % BattleConst.MAP_WIDTH;
 
-            int oppX = BattleConst.MAP_WIDTH - x;
+            int oppX = BattleConst.MAP_WIDTH - 1 - x;
 
             Turrent[] oppTurrent = parent.isMine ? battleCore.oTurrent : battleCore.mTurrent;
 
