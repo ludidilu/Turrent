@@ -37,6 +37,8 @@ namespace Turrent_lib
 
         private void RefreshData(BinaryReader _br)
         {
+            Reset();
+
             clientIsMine = _br.ReadBoolean();
 
             serverProcessBattle = _br.ReadBoolean();

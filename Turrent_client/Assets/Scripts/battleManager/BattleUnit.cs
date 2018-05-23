@@ -8,7 +8,7 @@ public class BattleUnit : MonoBehaviour
     private const string TEXT_FIX = "{0}  {1}/{2}";
 
     [SerializeField]
-    private float sizeFix = 10;
+    private float sizeFix = 30;
 
     [SerializeField]
     private Text text;
@@ -16,23 +16,28 @@ public class BattleUnit : MonoBehaviour
     [SerializeField]
     private BattleTurrent turrentRes;
 
-    private UnitSDS sds;
+    [SerializeField]
+    private RectTransform container;
 
-    private List<Turrent> list;
+    private Unit unit;
+
+    private UnitSDS sds;
 
     private bool isMine;
 
+    [HideInInspector]
     public int unitWidth;
 
+    [HideInInspector]
     public int unitHeight;
 
-    public void Init(bool _isMine, List<Turrent> _list)
+    public void Init(bool _isMine, Unit _unit)
     {
         isMine = _isMine;
 
-        list = _list;
+        unit = _unit;
 
-        sds = list[0].parent.sds as UnitSDS;
+        sds = unit.sds as UnitSDS;
 
         unitWidth = 0;
 
@@ -65,13 +70,22 @@ public class BattleUnit : MonoBehaviour
 
         float width = screenWidth / BattleConst.MAP_WIDTH;
 
-        (transform as RectTransform).sizeDelta = new Vector2(width * unitWidth - sizeFix, width * unitHeight - sizeFix);
+        container.sizeDelta = new Vector2(width * unitWidth - sizeFix, width * unitHeight - sizeFix);
+
+        if (isMine)
+        {
+            container.anchoredPosition = new Vector2(width * unitWidth * 0.5f - 0.5f * width, width * unitHeight * 0.5f - 0.5f * width);
+        }
+        else
+        {
+            container.anchoredPosition = new Vector2(-(width * unitWidth * 0.5f - 0.5f * width), -(width * unitHeight * 0.5f - 0.5f * width));
+        }
 
         Refresh();
     }
 
     public void Refresh()
     {
-        text.text = string.Format(TEXT_FIX, sds.name, list[0].parent.hp, sds.hp);
+        text.text = string.Format(TEXT_FIX, sds.name, unit.hp, sds.hp);
     }
 }

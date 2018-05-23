@@ -174,7 +174,7 @@ namespace Turrent_lib
 
                             bw.Write(uid);
 
-                            bw.Write(recordData.oCards[uid]);
+                            bw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
                         }
                     }
                     else

@@ -49,15 +49,19 @@ public partial class BattleManager : MonoBehaviour
     [HideInInspector]
     public GameObject eventGo;
 
-    private BattleClickGo[] myPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
+    private BattleClickGo[] mPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
-    private BattleClickGo[] oppPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
+    private BattleClickGo[] oPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
     private Turrent[] mTurrent;
 
     private Turrent[] oTurrent;
 
     private Dictionary<int, BattleCard> cards = new Dictionary<int, BattleCard>();
+
+    private Dictionary<int, BattleUnit> mTurrentDic = new Dictionary<int, BattleUnit>();
+
+    private Dictionary<int, BattleUnit> oTurrentDic = new Dictionary<int, BattleUnit>();
 
     private Battle_client battle = new Battle_client();
 
@@ -104,7 +108,7 @@ public partial class BattleManager : MonoBehaviour
 
                 go.transform.SetParent(transform, false);
 
-                myPosArr[id] = go;
+                mPosArr[id] = go;
 
                 (go.transform as RectTransform).anchoredPosition = new Vector2(-0.5f * screenWidth + width * 0.5f + m * width, -0.5f * turrentGap - 0.5f * width - i * width);
 
@@ -133,7 +137,7 @@ public partial class BattleManager : MonoBehaviour
 
                 go.transform.SetParent(transform, false);
 
-                myPosArr[id] = go;
+                oPosArr[id] = go;
 
                 (go.transform as RectTransform).anchoredPosition = new Vector2(0.5f * screenWidth - width * 0.5f - m * width, 0.5f * turrentGap + 0.5f * width + i * width);
 
@@ -183,7 +187,41 @@ public partial class BattleManager : MonoBehaviour
 
         Debug.Log("refreshData");
 
+        Reset();
+
         InitCards();
+
+        InitTurrent();
+    }
+
+    private void Reset()
+    {
+        IEnumerator<BattleCard> enumerator = cards.Values.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            Destroy(enumerator.Current.gameObject);
+        }
+
+        cards.Clear();
+
+        IEnumerator<BattleUnit> enumerator2 = mTurrentDic.Values.GetEnumerator();
+
+        while (enumerator2.MoveNext())
+        {
+            Destroy(enumerator2.Current.gameObject);
+        }
+
+        mTurrentDic.Clear();
+
+        enumerator2 = oTurrentDic.Values.GetEnumerator();
+
+        while (enumerator2.MoveNext())
+        {
+            Destroy(enumerator2.Current.gameObject);
+        }
+
+        oTurrentDic.Clear();
     }
 
     private void InitCards()
@@ -241,7 +279,7 @@ public partial class BattleManager : MonoBehaviour
 
         oTurrent = battle.GetOppTurrent();
 
-        Dictionary<Unit, List<Turrent>> dic = new Dictionary<Unit, List<Turrent>>();
+        Dictionary<Unit, Turrent> dic = new Dictionary<Unit, Turrent>();
 
         for (int i = 0; i < mTurrent.Length; i++)
         {
@@ -249,30 +287,72 @@ public partial class BattleManager : MonoBehaviour
 
             if (t != null)
             {
-                List<Turrent> list;
+                Turrent tt;
 
-                if (!dic.TryGetValue(t.parent, out list))
+                if (!dic.TryGetValue(t.parent, out tt))
                 {
-                    list = new List<Turrent>();
-
-                    dic.Add(t.parent, list);
+                    dic.Add(t.parent, t);
+                }
+                else if (t.pos < tt.pos)
+                {
+                    dic[t.parent] = t;
                 }
             }
         }
 
-        IEnumerator<List<Turrent>> ee = dic.Values.GetEnumerator();
+        IEnumerator<KeyValuePair<Unit, Turrent>> enumerator = dic.GetEnumerator();
 
-        while (ee.MoveNext())
+        while (enumerator.MoveNext())
         {
             BattleUnit unit = Instantiate(unitRes);
-
-            unit.Init(true, ee.Current);
 
             unit.gameObject.SetActive(true);
 
             unit.transform.SetParent(transform, false);
 
-            (unit.transform as RectTransform).anchoredPosition = new Vector2();
+            unit.Init(true, enumerator.Current.Key);
+
+            (unit.transform as RectTransform).anchoredPosition = (mPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
+
+            mTurrentDic.Add(enumerator.Current.Value.pos, unit);
+        }
+
+        dic.Clear();
+
+        for (int i = 0; i < oTurrent.Length; i++)
+        {
+            Turrent t = oTurrent[i];
+
+            if (t != null)
+            {
+                Turrent tt;
+
+                if (!dic.TryGetValue(t.parent, out tt))
+                {
+                    dic.Add(t.parent, t);
+                }
+                else if (t.pos < tt.pos)
+                {
+                    dic[t.parent] = t;
+                }
+            }
+        }
+
+        enumerator = dic.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            BattleUnit unit = Instantiate(unitRes);
+
+            unit.gameObject.SetActive(true);
+
+            unit.transform.SetParent(transform, false);
+
+            unit.Init(false, enumerator.Current.Key);
+
+            (unit.transform as RectTransform).anchoredPosition = (oPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
+
+            oTurrentDic.Add(enumerator.Current.Value.pos, unit);
         }
     }
 
@@ -288,6 +368,10 @@ public partial class BattleManager : MonoBehaviour
 
                 battle.ClientRequestAddAction(uid, 0);
             }
+        }
+        else if (Input.GetKeyUp(KeyCode.F5))
+        {
+            battle.ClientRequestRefreshData();
         }
     }
 }

@@ -348,7 +348,7 @@ namespace Turrent_lib
             actionList.Add(new Tuple<bool, int, int>(_isMine, _uid, _pos));
         }
 
-        private void Reset()
+        protected void Reset()
         {
             mHandCards.Clear();
 
@@ -371,6 +371,8 @@ namespace Turrent_lib
 
                 oTurrent[i] = null;
             }
+
+            tick = 0;
         }
     }
 }
