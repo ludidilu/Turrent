@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 
 namespace Turrent_lib
 {
@@ -37,19 +38,19 @@ namespace Turrent_lib
             time = _time + sds.GetCd();
         }
 
-        internal void Update()
+        internal IEnumerator Update()
         {
             if (state == TurrentState.CD)
             {
                 state = TurrentState.FREE;
             }
 
-            Attack();
+            yield return Attack();
 
             time += sds.GetAttackGap();
         }
 
-        private void Attack()
+        private BattleAttackVO Attack()
         {
             int x = pos % BattleConst.MAP_WIDTH;
 
@@ -76,6 +77,8 @@ namespace Turrent_lib
                 {
                     KeyValuePair<int, int>[] arr = sds.GetAttackDamagePos()[i];
 
+                    List<KeyValuePair<int, int>> damageDataList = new List<KeyValuePair<int, int>>();
+
                     for (int m = 0; m < arr.Length; m++)
                     {
                         KeyValuePair<int, int> damagePosFix = arr[m];
@@ -95,15 +98,19 @@ namespace Turrent_lib
 
                         if (damageTurrent != null)
                         {
-                            damageTurrent.parent.BeDamage(this);
+                            int damage = damageTurrent.parent.BeDamage(this);
+
+                            damageDataList.Add(new KeyValuePair<int, int>(damagePos, damage));
                         }
                     }
 
-                    return;
+                    return new BattleAttackVO(pos, damageDataList);
                 }
             }
 
-            battleCore.BaseBeDamage(this);
+            int baseDamage = battleCore.BaseBeDamage(this);
+
+            return new BattleAttackVO(pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
         }
     }
 }

@@ -19,9 +19,11 @@
             sds = _sds;
         }
 
-        internal void BeDamage(Turrent _turrent)
+        internal int BeDamage(Turrent _turrent)
         {
             hp -= _turrent.sds.GetAttackDamage();
+
+            return -_turrent.sds.GetAttackDamage();
         }
     }
 }

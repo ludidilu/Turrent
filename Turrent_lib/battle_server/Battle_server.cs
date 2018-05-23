@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using superEnumerator;
 
 namespace Turrent_lib
 {
@@ -163,6 +164,8 @@ namespace Turrent_lib
 
                         for (int i = 0; i < mCardsShowNum; i++)
                         {
+                            bw.Write(true);
+
                             bw.Write(i);
 
                             bw.Write(recordData.mCards[i]);
@@ -172,9 +175,11 @@ namespace Turrent_lib
                         {
                             int uid = mCardsShowList[i];
 
+                            bw.Write(false);
+
                             bw.Write(uid);
 
-                            bw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
+                            bw.Write(recordData.oCards[uid]);
                         }
                     }
                     else
@@ -183,7 +188,9 @@ namespace Turrent_lib
 
                         for (int i = 0; i < oCardsShowNum; i++)
                         {
-                            bw.Write(i + BattleConst.DECK_CARD_NUM);
+                            bw.Write(false);
+
+                            bw.Write(i);
 
                             bw.Write(recordData.oCards[i]);
                         }
@@ -191,6 +198,8 @@ namespace Turrent_lib
                         for (int i = 0; i < oCardsShowList.Count; i++)
                         {
                             int uid = oCardsShowList[i];
+
+                            bw.Write(true);
 
                             bw.Write(uid);
 
@@ -228,15 +237,6 @@ namespace Turrent_lib
             int pos = _br.ReadInt32();
 
             Log.Write("ServerDoAction:" + uid + "    " + pos);
-
-            if (_isMine && uid >= BattleConst.DECK_CARD_NUM)
-            {
-                throw new Exception("ServerDoAction error0");
-            }
-            else if (!_isMine && uid < BattleConst.DECK_CARD_NUM)
-            {
-                throw new Exception("ServerDoAction error1");
-            }
 
             List<PlayerAction> list;
 
@@ -282,9 +282,9 @@ namespace Turrent_lib
 
                         oBw.Write(list.Count);
 
-                        List<int> mList = new List<int>();
+                        List<KeyValuePair<bool, int>> mList = null;
 
-                        List<int> oList = new List<int>();
+                        List<KeyValuePair<bool, int>> oList = null;
 
                         for (int i = 0; i < list.Count; i++)
                         {
@@ -296,66 +296,104 @@ namespace Turrent_lib
 
                             if (action.isMine)
                             {
-                                oList.Add(action.uid);
+                                if (oList == null)
+                                {
+                                    oList = new List<KeyValuePair<bool, int>>();
+                                }
+
+                                oList.Add(new KeyValuePair<bool, int>(true, action.uid));
 
                                 oCardsShowList.Add(action.uid);
 
                                 if (recordData.mCards.Length > mCardsShowNum)
                                 {
-                                    mList.Add(mCardsShowNum);
+                                    if (mList == null)
+                                    {
+                                        mList = new List<KeyValuePair<bool, int>>();
+                                    }
+
+                                    mList.Add(new KeyValuePair<bool, int>(true, mCardsShowNum));
 
                                     mCardsShowNum++;
                                 }
                             }
                             else
                             {
-                                mList.Add(action.uid);
+                                if (mList == null)
+                                {
+                                    mList = new List<KeyValuePair<bool, int>>();
+                                }
+
+                                mList.Add(new KeyValuePair<bool, int>(false, action.uid));
 
                                 mCardsShowList.Add(action.uid);
 
                                 if (recordData.oCards.Length > oCardsShowNum)
                                 {
-                                    oList.Add(oCardsShowNum + BattleConst.DECK_CARD_NUM);
+                                    if (oList == null)
+                                    {
+                                        oList = new List<KeyValuePair<bool, int>>();
+                                    }
+
+                                    oList.Add(new KeyValuePair<bool, int>(false, oCardsShowNum));
 
                                     oCardsShowNum++;
                                 }
                             }
                         }
 
-                        mBw.Write(mList.Count);
-
-                        for (int i = 0; i < mList.Count; i++)
+                        if (mList != null)
                         {
-                            int uid = mList[i];
+                            mBw.Write(mList.Count);
 
-                            mBw.Write(uid);
+                            for (int i = 0; i < mList.Count; i++)
+                            {
+                                KeyValuePair<bool, int> pair = mList[i];
 
-                            if (uid < BattleConst.DECK_CARD_NUM)
-                            {
-                                mBw.Write(recordData.mCards[uid]);
-                            }
-                            else
-                            {
-                                mBw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
+                                mBw.Write(pair.Key);
+
+                                mBw.Write(pair.Value);
+
+                                if (pair.Key)
+                                {
+                                    mBw.Write(recordData.mCards[pair.Value]);
+                                }
+                                else
+                                {
+                                    mBw.Write(recordData.oCards[pair.Value]);
+                                }
                             }
                         }
-
-                        oBw.Write(oList.Count);
-
-                        for (int i = 0; i < oList.Count; i++)
+                        else
                         {
-                            int uid = oList[i];
+                            mBw.Write(0);
+                        }
 
-                            oBw.Write(uid);
+                        if (oList != null)
+                        {
+                            oBw.Write(oList.Count);
 
-                            if (uid < BattleConst.DECK_CARD_NUM)
+                            for (int i = 0; i < oList.Count; i++)
                             {
-                                oBw.Write(recordData.mCards[uid]);
+                                KeyValuePair<bool, int> pair = oList[i];
+
+                                oBw.Write(pair.Key);
+
+                                oBw.Write(pair.Value);
+
+                                if (pair.Key)
+                                {
+                                    oBw.Write(recordData.mCards[pair.Value]);
+                                }
+                                else
+                                {
+                                    oBw.Write(recordData.oCards[pair.Value]);
+                                }
                             }
-                            else
-                            {
-                                oBw.Write(recordData.oCards[uid - BattleConst.DECK_CARD_NUM]);
-                            }
+                        }
+                        else
+                        {
+                            oBw.Write(0);
                         }
 
                         serverSendDataCallBack(true, true, mMs);
@@ -387,7 +425,9 @@ namespace Turrent_lib
 
             if (processBattle || recordData.isVsAi)
             {
-                battle.Update();
+                SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(battle.Update());
+
+                superEnumerator.Done();
             }
         }
 

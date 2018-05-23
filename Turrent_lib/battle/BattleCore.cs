@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using tuple;
 
@@ -43,7 +44,9 @@ namespace Turrent_lib
 
         internal Queue<int> oCards = new Queue<int>();
 
-        private int[] cardsArr = new int[BattleConst.DECK_CARD_NUM * 2];
+        private int[] mCardsArr = new int[BattleConst.DECK_CARD_NUM];
+
+        private int[] oCardsArr = new int[BattleConst.DECK_CARD_NUM];
 
         protected int tick;
 
@@ -57,7 +60,7 @@ namespace Turrent_lib
 
             for (int i = 0; i < BattleConst.DECK_CARD_NUM && i < _mCards.Length; i++)
             {
-                SetCard(i, _mCards[i]);
+                SetCard(true, i, _mCards[i]);
 
                 if (i < BattleConst.DEFAULT_HAND_CARDS_NUM)
                 {
@@ -71,22 +74,20 @@ namespace Turrent_lib
 
             for (int i = 0; i < BattleConst.DECK_CARD_NUM && i < _oCards.Length; i++)
             {
-                int index = BattleConst.DECK_CARD_NUM + i;
-
-                SetCard(index, _oCards[i]);
+                SetCard(false, i, _oCards[i]);
 
                 if (i < BattleConst.DEFAULT_HAND_CARDS_NUM)
                 {
-                    oHandCards.Add(index);
+                    oHandCards.Add(i);
                 }
                 else
                 {
-                    oCards.Enqueue(index);
+                    oCards.Enqueue(i);
                 }
             }
         }
 
-        protected int CheckAddSummon(bool _isMine, int _uid, int _pos)
+        public int CheckAddSummon(bool _isMine, int _uid, int _pos)
         {
             List<int> handCards;
 
@@ -115,7 +116,7 @@ namespace Turrent_lib
 
             if (handCardsIndex != -1)
             {
-                int unitID = GetCard(_uid);
+                int unitID = GetCard(_isMine, _uid);
 
                 IUnitSDS sds = getUnitData(unitID);
 
@@ -169,9 +170,9 @@ namespace Turrent_lib
             }
         }
 
-        private void AddSummon(bool _isMine, int _uid, int _pos)
+        private BattleSummonVO AddSummon(bool _isMine, int _uid, int _pos)
         {
-            int unitID = GetCard(_uid);
+            int unitID = GetCard(_isMine, _uid);
 
             IUnitSDS sds = getUnitData(unitID);
 
@@ -189,6 +190,8 @@ namespace Turrent_lib
             }
 
             AddUnit(_isMine, sds, _pos);
+
+            return new BattleSummonVO(_isMine, _uid, _pos);
         }
 
         private void AddUnit(bool _isMine, IUnitSDS _sds, int _pos)
@@ -215,28 +218,42 @@ namespace Turrent_lib
             }
         }
 
-        public int GetCard(int _uid)
+        public int GetCard(bool _isMine, int _uid)
         {
-            return cardsArr[_uid];
+            if (_isMine)
+            {
+                return mCardsArr[_uid];
+            }
+            else
+            {
+                return oCardsArr[_uid];
+            }
         }
 
-        protected void SetCard(int _uid, int _id)
+        protected void SetCard(bool _isMine, int _uid, int _id)
         {
-            cardsArr[_uid] = _id;
+            if (_isMine)
+            {
+                mCardsArr[_uid] = _id;
+            }
+            else
+            {
+                oCardsArr[_uid] = _id;
+            }
         }
 
-        internal void Update()
+        internal IEnumerator Update()
         {
             tick++;
 
-            UpdateTurrent();
+            yield return UpdateTurrent();
 
-            UpdateAction();
+            yield return UpdateAction();
 
             UpdateRecover();
         }
 
-        private void UpdateTurrent()
+        private IEnumerator UpdateTurrent()
         {
             int time = tick * BattleConst.TICK_TIME;
 
@@ -274,7 +291,7 @@ namespace Turrent_lib
 
                     if (time >= turrent.time)
                     {
-                        turrent.Update();
+                        yield return turrent.Update();
                     }
                     else
                     {
@@ -286,7 +303,7 @@ namespace Turrent_lib
             }
         }
 
-        private void UpdateAction()
+        private IEnumerator UpdateAction()
         {
             if (actionList.Count > 0)
             {
@@ -298,7 +315,7 @@ namespace Turrent_lib
 
                     if (result < 0)
                     {
-                        AddSummon(t.first, t.second, t.third);
+                        yield return AddSummon(t.first, t.second, t.third);
                     }
                     else
                     {
@@ -315,7 +332,7 @@ namespace Turrent_lib
 
         }
 
-        internal void BaseBeDamage(Turrent _turrent)
+        internal int BaseBeDamage(Turrent _turrent)
         {
             if (_turrent.parent.isMine)
             {
@@ -325,6 +342,8 @@ namespace Turrent_lib
             {
                 mBase -= _turrent.sds.GetAttackDamage();
             }
+
+            return -_turrent.sds.GetAttackDamage();
         }
 
         private static int SortTurrentList(Turrent _t0, Turrent _t1)
@@ -360,9 +379,11 @@ namespace Turrent_lib
 
             actionList.Clear();
 
-            for (int i = 0; i < cardsArr.Length; i++)
+            for (int i = 0; i < BattleConst.DECK_CARD_NUM; i++)
             {
-                cardsArr[i] = 0;
+                mCardsArr[i] = 0;
+
+                oCardsArr[i] = 0;
             }
 
             for (int i = 0; i < mTurrent.Length; i++)

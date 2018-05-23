@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System;
 using superFunction;
 using Turrent_lib;
+using superEnumerator;
 
 public partial class BattleManager : MonoBehaviour
 {
@@ -77,7 +78,7 @@ public partial class BattleManager : MonoBehaviour
 
         BattleCore.Init(unitDic, turrentDic);
 
-        battle.Init(SendData, RefreshData);
+        battle.Init(SendData, RefreshData, ClientUpdate);
 
         SuperFunction.Instance.AddEventListener<BinaryReader>(eventGo, BATTLE_RECEIVE_DATA, ReceiveData);
 
@@ -244,7 +245,7 @@ public partial class BattleManager : MonoBehaviour
             {
                 int uid = handCards[i];
 
-                int id = battle.GetCard(uid);
+                int id = battle.GetCard(battle.clientIsMine, uid);
 
                 BattleCard card = Instantiate(cardRes);
 
@@ -372,6 +373,23 @@ public partial class BattleManager : MonoBehaviour
         else if (Input.GetKeyUp(KeyCode.F5))
         {
             battle.ClientRequestRefreshData();
+        }
+    }
+
+    private void ClientUpdate(SuperEnumerator<ValueType> _superEnumerator)
+    {
+        bool needRefresh = false;
+
+        while (_superEnumerator.MoveNext())
+        {
+            needRefresh = true;
+
+            ValueType ss = _superEnumerator.Current;
+        }
+
+        if (needRefresh)
+        {
+            RefreshData();
         }
     }
 }

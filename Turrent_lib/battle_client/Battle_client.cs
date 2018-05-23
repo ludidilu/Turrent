@@ -1,4 +1,5 @@
-﻿using System;
+﻿using superEnumerator;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -14,11 +15,15 @@ namespace Turrent_lib
 
         private Action clientRefreshDataCallBack;
 
-        public void Init(Action<MemoryStream, Action<BinaryReader>> _clientSendDataCallBack, Action _clientRefreshDataCallBack)
+        private Action<SuperEnumerator<ValueType>> clientDoActionCallBack;
+
+        public void Init(Action<MemoryStream, Action<BinaryReader>> _clientSendDataCallBack, Action _clientRefreshDataCallBack, Action<SuperEnumerator<ValueType>> _clientDoActionCallBack)
         {
             clientSendDataCallBack = _clientSendDataCallBack;
 
             clientRefreshDataCallBack = _clientRefreshDataCallBack;
+
+            clientDoActionCallBack = _clientDoActionCallBack;
         }
 
         public void ClientGetPackage(BinaryReader _br)
@@ -59,11 +64,13 @@ namespace Turrent_lib
 
             for (int i = 0; i < num; i++)
             {
+                bool isMine = _br.ReadBoolean();
+
                 int uid = _br.ReadInt32();
 
                 int id = _br.ReadInt32();
 
-                SetCard(uid, id);
+                SetCard(isMine, uid, id);
             }
 
             num = _br.ReadInt32();
@@ -74,7 +81,12 @@ namespace Turrent_lib
 
                 for (int m = tick; m < tmpTick; m++)
                 {
-                    Update();
+                    SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(Update());
+
+                    while (superEnumerator.MoveNext())
+                    {
+
+                    }
                 }
 
                 int num2 = _br.ReadInt32();
@@ -93,7 +105,12 @@ namespace Turrent_lib
 
             for (int i = tick; i < nowTick; i++)
             {
-                Update();
+                SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(Update());
+
+                while (superEnumerator.MoveNext())
+                {
+
+                }
             }
 
             clientRefreshDataCallBack();
@@ -127,15 +144,19 @@ namespace Turrent_lib
 
                 for (int i = 0; i < num; i++)
                 {
+                    bool isMine = _br.ReadBoolean();
+
                     int uid = _br.ReadInt32();
 
                     int id = _br.ReadInt32();
 
-                    SetCard(uid, id);
+                    SetCard(isMine, uid, id);
                 }
             }
 
-            Update();
+            SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(Update());
+
+            clientDoActionCallBack(superEnumerator);
         }
 
         public int ClientRequestAddAction(int _uid, int _pos)
