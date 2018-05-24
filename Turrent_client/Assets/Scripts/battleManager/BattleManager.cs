@@ -309,8 +309,6 @@ public partial class BattleManager : MonoBehaviour
 
                     card.transform.SetParent(transform, false);
 
-                    (card.transform as RectTransform).anchoredPosition = new Vector2(x + i * (size.x + cardGap), y);
-
                     SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
                     {
                         ClickCard(card);
@@ -324,6 +322,8 @@ public partial class BattleManager : MonoBehaviour
                 {
                     card = cards[i];
                 }
+
+                (card.transform as RectTransform).anchoredPosition = new Vector2(x + i * (size.x + cardGap), y);
 
                 card.Init(uid, id);
 

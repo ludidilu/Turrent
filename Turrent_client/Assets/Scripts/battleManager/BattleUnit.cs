@@ -45,6 +45,8 @@ public class BattleUnit : MonoBehaviour
 
         sds = unit.sds as UnitSDS;
 
+        text.text = sds.name;
+
         int unitWidth = 0;
 
         int unitHeight = 0;
@@ -129,8 +131,6 @@ public class BattleUnit : MonoBehaviour
 
     public void Refresh()
     {
-        text.text = sds.name;
-
         hpBar.sizeDelta = new Vector2((float)unit.hp / sds.hp * bgWidth, hpBar.sizeDelta.y);
     }
 }
