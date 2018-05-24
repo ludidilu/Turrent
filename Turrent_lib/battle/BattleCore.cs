@@ -292,37 +292,38 @@ namespace Turrent_lib
                 }
             }
 
-            if (list.Count > 0)
+            int lastProcessTime = -1;
+
+            while (list.Count > 0)
             {
-                int lastProcessTime = -1;
+                list.Sort(SortTurrentList);
 
-                while (true)
+                Turrent turrent = list[0];
+
+                if (time >= turrent.time)
                 {
-                    list.Sort(SortTurrentList);
-
-                    Turrent turrent = list[0];
-
-                    if (time >= turrent.time)
+                    if (lastProcessTime == -1)
                     {
-                        if (lastProcessTime == -1)
-                        {
-                            lastProcessTime = turrent.time;
-                        }
-                        else if (turrent.time > lastProcessTime)
-                        {
-                            lastProcessTime = turrent.time;
-
-                            RemoveDieUnit(list);
-                        }
+                        lastProcessTime = turrent.time;
 
                         yield return turrent.Update();
                     }
+                    else if (turrent.time > lastProcessTime)
+                    {
+                        RemoveDieUnit(list);
+
+                        lastProcessTime = -1;
+                    }
                     else
                     {
-                        RemoveDieUnit(null);
-
-                        break;
+                        yield return turrent.Update();
                     }
+                }
+                else
+                {
+                    RemoveDieUnit(null);
+
+                    break;
                 }
             }
         }

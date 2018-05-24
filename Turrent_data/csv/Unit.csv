@@ -5,3 +5,4 @@ ID,name,row,pos,turrent,hp,cost,isSkill
 2,pao2,0,0$1$2,1$1$1,200,5,0
 3,pao3,0,0$1$5$6,1$1$1$1,150,4,0
 4,paor4,0$1,0,2,100,3,0
+5,skill,2,0,3,10,1,1
