@@ -420,9 +420,9 @@ public partial class BattleManager : MonoBehaviour
                 unit = mTurrentList[index];
             }
 
-            unit.Init(true, enumerator.Current.Key);
-
             (unit.transform as RectTransform).anchoredPosition = (mPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
+
+            unit.Init(this, true, enumerator.Current.Key, enumerator.Current.Value.pos);
 
             index++;
         }
@@ -478,9 +478,9 @@ public partial class BattleManager : MonoBehaviour
                 unit = oTurrentList[index];
             }
 
-            unit.Init(false, enumerator.Current.Key);
-
             (unit.transform as RectTransform).anchoredPosition = (oPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
+
+            unit.Init(this, false, enumerator.Current.Key, enumerator.Current.Value.pos);
 
             index++;
         }
@@ -490,6 +490,18 @@ public partial class BattleManager : MonoBehaviour
             Destroy(oTurrentList[oTurrentList.Count - 1].gameObject);
 
             oTurrentList.RemoveAt(oTurrentList.Count - 1);
+        }
+    }
+
+    public Vector3 GetPos(bool _isMine, int _index)
+    {
+        if (_isMine)
+        {
+            return mPosArr[_index].transform.position;
+        }
+        else
+        {
+            return oPosArr[_index].transform.position;
         }
     }
 
