@@ -103,7 +103,7 @@ namespace Turrent_lib
 
                         if (damageTurrent != null)
                         {
-                            int damage = damageTurrent.parent.BeDamage(this);
+                            int damage = damageTurrent.BeDamage(this);
 
                             damageDataList.Add(new KeyValuePair<int, int>(damagePos, damage));
                         }
@@ -116,6 +116,11 @@ namespace Turrent_lib
             int baseDamage = battleCore.BaseBeDamage(this);
 
             return new BattleAttackVO(parent.isMine, pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
+        }
+
+        private int BeDamage(Turrent _turrent)
+        {
+            return parent.BeDamage(_turrent);
         }
     }
 }

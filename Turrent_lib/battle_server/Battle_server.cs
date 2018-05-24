@@ -98,9 +98,9 @@ namespace Turrent_lib
 
             InitCards(recordData, _mCards, _oCards);
 
-            mCardsShowNum = Math.Min(BattleConst.DEFAULT_HAND_CARDS_NUM, recordData.mCards.Length);
+            mCardsShowNum = Math.Min(BattleConst.HAND_CARDS_NUM, recordData.mCards.Length);
 
-            oCardsShowNum = Math.Min(BattleConst.DEFAULT_HAND_CARDS_NUM, recordData.oCards.Length);
+            oCardsShowNum = Math.Min(BattleConst.HAND_CARDS_NUM, recordData.oCards.Length);
 
             if (processBattle || recordData.isVsAi)
             {

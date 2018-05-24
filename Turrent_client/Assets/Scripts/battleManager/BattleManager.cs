@@ -69,11 +69,11 @@ public partial class BattleManager : MonoBehaviour
 
     private Turrent[] oTurrent;
 
-    private Dictionary<int, BattleCard> cards = new Dictionary<int, BattleCard>();
+    private List<BattleCard> cards = new List<BattleCard>();
 
-    private Dictionary<int, BattleUnit> mTurrentDic = new Dictionary<int, BattleUnit>();
+    private List<BattleUnit> mTurrentList = new List<BattleUnit>();
 
-    private Dictionary<int, BattleUnit> oTurrentDic = new Dictionary<int, BattleUnit>();
+    private List<BattleUnit> oTurrentList = new List<BattleUnit>();
 
     private Battle_client battle = new Battle_client();
 
@@ -190,8 +190,6 @@ public partial class BattleManager : MonoBehaviour
 
     private void BgMouseDown(int _index)
     {
-        Debug.Log("BgMouseDown");
-
         nowSelectedCardUid = -1;
 
         RefreshSelectedCard();
@@ -199,13 +197,9 @@ public partial class BattleManager : MonoBehaviour
 
     private void ClickMyPos(int _id)
     {
-        Debug.Log("ClickMyPos:" + _id);
-
         if (nowSelectedCardUid != -1)
         {
             int result = battle.CheckAddSummon(battle.clientIsMine, nowSelectedCardUid, _id);
-
-            Debug.Log("CheckAddSummon:" + result);
 
             if (result == -1)
             {
@@ -222,7 +216,6 @@ public partial class BattleManager : MonoBehaviour
 
     private void ClickOppPos(int _id)
     {
-        Debug.Log("ClickOppPos:" + _id);
     }
 
     public void StartBattle()
@@ -249,7 +242,7 @@ public partial class BattleManager : MonoBehaviour
     {
         initOver = true;
 
-        Reset();
+        //Reset();
 
         InitCards();
 
@@ -260,32 +253,26 @@ public partial class BattleManager : MonoBehaviour
 
     private void Reset()
     {
-        IEnumerator<BattleCard> enumerator = cards.Values.GetEnumerator();
-
-        while (enumerator.MoveNext())
+        for (int i = 0; i < cards.Count; i++)
         {
-            Destroy(enumerator.Current.gameObject);
+            Destroy(cards[i].gameObject);
         }
 
         cards.Clear();
 
-        IEnumerator<BattleUnit> enumerator2 = mTurrentDic.Values.GetEnumerator();
-
-        while (enumerator2.MoveNext())
+        for (int i = 0; i < mTurrentList.Count; i++)
         {
-            Destroy(enumerator2.Current.gameObject);
+            Destroy(mTurrentList[i].gameObject);
         }
 
-        mTurrentDic.Clear();
+        mTurrentList.Clear();
 
-        enumerator2 = oTurrentDic.Values.GetEnumerator();
-
-        while (enumerator2.MoveNext())
+        for (int i = 0; i < oTurrentList.Count; i++)
         {
-            Destroy(enumerator2.Current.gameObject);
+            Destroy(oTurrentList[i].gameObject);
         }
 
-        oTurrentDic.Clear();
+        oTurrentList.Clear();
     }
 
     private void InitCards()
@@ -312,30 +299,43 @@ public partial class BattleManager : MonoBehaviour
 
                 int id = battle.GetCard(battle.clientIsMine, uid);
 
-                BattleCard card = Instantiate(cardRes);
+                BattleCard card;
 
-                card.gameObject.SetActive(true);
+                if (cards.Count == i)
+                {
+                    card = Instantiate(cardRes);
+
+                    card.gameObject.SetActive(true);
+
+                    card.transform.SetParent(transform, false);
+
+                    (card.transform as RectTransform).anchoredPosition = new Vector2(x + i * (size.x + cardGap), y);
+
+                    SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
+                    {
+                        ClickCard(card);
+                    };
+
+                    SuperFunction.Instance.AddEventListener(card.gameObject, BattleClickGo.EVENT_NAME, dele);
+
+                    cards.Add(card);
+                }
+                else
+                {
+                    card = cards[i];
+                }
 
                 card.Init(uid, id);
-
-                card.transform.SetParent(transform, false);
-
-                (card.transform as RectTransform).anchoredPosition = new Vector2(x + i * (size.x + cardGap), y);
-
-                SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
-                {
-                    ClickCard(card);
-                };
-
-                SuperFunction.Instance.AddEventListener(card.gameObject, BattleClickGo.EVENT_NAME, dele);
-
-                cards.Add(uid, card);
 
                 if (card.uid == nowSelectedCardUid)
                 {
                     getSelectedCard = true;
 
                     card.SetSelected(true);
+                }
+                else
+                {
+                    card.SetSelected(false);
                 }
             }
 
@@ -344,12 +344,17 @@ public partial class BattleManager : MonoBehaviour
                 nowSelectedCardUid = -1;
             }
         }
+
+        while (cards.Count > handCards.Count)
+        {
+            Destroy(cards[cards.Count - 1].gameObject);
+
+            cards.RemoveAt(cards.Count - 1);
+        }
     }
 
     private void ClickCard(BattleCard _card)
     {
-        Debug.Log("ClickCard");
-
         nowSelectedCardUid = _card.uid;
 
         RefreshSelectedCard();
@@ -357,11 +362,11 @@ public partial class BattleManager : MonoBehaviour
 
     private void RefreshSelectedCard()
     {
-        IEnumerator<BattleCard> enumerator = cards.Values.GetEnumerator();
-
-        while (enumerator.MoveNext())
+        for (int i = 0; i < cards.Count; i++)
         {
-            enumerator.Current.SetSelected(enumerator.Current.uid == nowSelectedCardUid);
+            BattleCard card = cards[i];
+
+            card.SetSelected(card.uid == nowSelectedCardUid);
         }
     }
 
@@ -392,21 +397,41 @@ public partial class BattleManager : MonoBehaviour
             }
         }
 
+        int index = 0;
+
         IEnumerator<KeyValuePair<Unit, Turrent>> enumerator = dic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            BattleUnit unit = Instantiate(unitRes);
+            BattleUnit unit;
 
-            unit.gameObject.SetActive(true);
+            if (mTurrentList.Count == index)
+            {
+                unit = Instantiate(unitRes);
 
-            unit.transform.SetParent(transform, false);
+                unit.gameObject.SetActive(true);
+
+                unit.transform.SetParent(transform, false);
+
+                mTurrentList.Add(unit);
+            }
+            else
+            {
+                unit = mTurrentList[index];
+            }
 
             unit.Init(true, enumerator.Current.Key);
 
             (unit.transform as RectTransform).anchoredPosition = (mPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
 
-            mTurrentDic.Add(enumerator.Current.Value.pos, unit);
+            index++;
+        }
+
+        while (mTurrentList.Count > dic.Count)
+        {
+            Destroy(mTurrentList[mTurrentList.Count - 1].gameObject);
+
+            mTurrentList.RemoveAt(mTurrentList.Count - 1);
         }
 
         dic.Clear();
@@ -430,21 +455,41 @@ public partial class BattleManager : MonoBehaviour
             }
         }
 
+        index = 0;
+
         enumerator = dic.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
-            BattleUnit unit = Instantiate(unitRes);
+            BattleUnit unit;
 
-            unit.gameObject.SetActive(true);
+            if (oTurrentList.Count == index)
+            {
+                unit = Instantiate(unitRes);
 
-            unit.transform.SetParent(transform, false);
+                unit.gameObject.SetActive(true);
+
+                unit.transform.SetParent(transform, false);
+
+                oTurrentList.Add(unit);
+            }
+            else
+            {
+                unit = oTurrentList[index];
+            }
 
             unit.Init(false, enumerator.Current.Key);
 
             (unit.transform as RectTransform).anchoredPosition = (oPosArr[enumerator.Current.Value.pos].transform as RectTransform).anchoredPosition;
 
-            oTurrentDic.Add(enumerator.Current.Value.pos, unit);
+            index++;
+        }
+
+        while (oTurrentList.Count > dic.Count)
+        {
+            Destroy(oTurrentList[oTurrentList.Count - 1].gameObject);
+
+            oTurrentList.RemoveAt(oTurrentList.Count - 1);
         }
     }
 

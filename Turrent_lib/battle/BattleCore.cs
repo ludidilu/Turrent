@@ -68,7 +68,7 @@ namespace Turrent_lib
             {
                 SetCard(true, i, _mCards[i]);
 
-                if (i < BattleConst.DEFAULT_HAND_CARDS_NUM)
+                if (i < BattleConst.HAND_CARDS_NUM)
                 {
                     mHandCards.Add(i);
                 }
@@ -82,7 +82,7 @@ namespace Turrent_lib
             {
                 SetCard(false, i, _oCards[i]);
 
-                if (i < BattleConst.DEFAULT_HAND_CARDS_NUM)
+                if (i < BattleConst.HAND_CARDS_NUM)
                 {
                     oHandCards.Add(i);
                 }
@@ -407,6 +407,16 @@ namespace Turrent_lib
                 oMoney++;
 
                 oMoneyTime += BattleConst.RECOVER_MONEY_TIME;
+            }
+
+            while (mHandCards.Count < BattleConst.HAND_CARDS_NUM && mCards.Count > 0)
+            {
+                mHandCards.Add(mCards.Dequeue());
+            }
+
+            while (oHandCards.Count < BattleConst.HAND_CARDS_NUM && oCards.Count > 0)
+            {
+                oHandCards.Add(oCards.Dequeue());
             }
         }
 
