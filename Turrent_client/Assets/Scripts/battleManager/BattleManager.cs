@@ -34,10 +34,10 @@ public partial class BattleManager : MonoBehaviour
     private Text oMoney;
 
     [SerializeField]
-    private BattleClickGo myPosRes;
+    private BattleCell mPosRes;
 
     [SerializeField]
-    private BattleClickGo oppPosRes;
+    private BattleClickGo oPosRes;
 
     [SerializeField]
     private BattleCard cardRes;
@@ -57,7 +57,7 @@ public partial class BattleManager : MonoBehaviour
     [HideInInspector]
     public GameObject eventGo;
 
-    private BattleClickGo[] mPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
+    private BattleCell[] mPosArr = new BattleCell[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
     private BattleClickGo[] oPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
@@ -77,7 +77,22 @@ public partial class BattleManager : MonoBehaviour
 
     private Battle_client battle = new Battle_client();
 
-    private int nowSelectedCardUid = -1;
+    private int m_nowSelectedCardUid = -1;
+
+    private int nowSelectedCardUid
+    {
+        get
+        {
+            return m_nowSelectedCardUid;
+        }
+
+        set
+        {
+            m_nowSelectedCardUid = value;
+
+            RefreshSelectedCard();
+        }
+    }
 
     private bool initOver;
 
@@ -114,7 +129,7 @@ public partial class BattleManager : MonoBehaviour
             {
                 int id = i * BattleConst.MAP_WIDTH + m;
 
-                BattleClickGo go = Instantiate(myPosRes);
+                BattleCell go = Instantiate(mPosRes);
 
                 go.gameObject.SetActive(true);
 
@@ -151,7 +166,7 @@ public partial class BattleManager : MonoBehaviour
             {
                 int id = i * BattleConst.MAP_WIDTH + m;
 
-                BattleClickGo go = Instantiate(oppPosRes);
+                BattleClickGo go = Instantiate(oPosRes);
 
                 go.gameObject.SetActive(true);
 
@@ -191,8 +206,6 @@ public partial class BattleManager : MonoBehaviour
     private void BgMouseDown(int _index)
     {
         nowSelectedCardUid = -1;
-
-        RefreshSelectedCard();
     }
 
     private void ClickMyPos(int _id)
@@ -208,8 +221,6 @@ public partial class BattleManager : MonoBehaviour
             else
             {
                 nowSelectedCardUid = -1;
-
-                RefreshSelectedCard();
             }
         }
     }
@@ -356,8 +367,6 @@ public partial class BattleManager : MonoBehaviour
     private void ClickCard(BattleCard _card)
     {
         nowSelectedCardUid = _card.uid;
-
-        RefreshSelectedCard();
     }
 
     private void RefreshSelectedCard()
@@ -367,6 +376,30 @@ public partial class BattleManager : MonoBehaviour
             BattleCard card = cards[i];
 
             card.SetSelected(card.uid == nowSelectedCardUid);
+        }
+
+        if (nowSelectedCardUid == -1)
+        {
+            for (int i = 0; i < mPosArr.Length; i++)
+            {
+                mPosArr[i].SetHintVisible(false);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < mPosArr.Length; i++)
+            {
+                int result = battle.CheckAddSummon(battle.clientIsMine, nowSelectedCardUid, i);
+
+                if (result == -1)
+                {
+                    mPosArr[i].SetHintVisible(true);
+                }
+                else
+                {
+                    mPosArr[i].SetHintVisible(false);
+                }
+            }
         }
     }
 
