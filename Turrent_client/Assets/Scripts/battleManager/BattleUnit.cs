@@ -74,11 +74,11 @@ public class BattleUnit : MonoBehaviour
 
         if (isMine)
         {
-            container.anchoredPosition = new Vector2(width * unitWidth * 0.5f - 0.5f * width, width * unitHeight * 0.5f - 0.5f * width);
+            container.anchoredPosition = new Vector2(width * unitWidth * 0.5f - 0.5f * width, -(width * unitHeight * 0.5f - 0.5f * width));
         }
         else
         {
-            container.anchoredPosition = new Vector2(-(width * unitWidth * 0.5f - 0.5f * width), -(width * unitHeight * 0.5f - 0.5f * width));
+            container.anchoredPosition = new Vector2(-(width * unitWidth * 0.5f - 0.5f * width), (width * unitHeight * 0.5f - 0.5f * width));
         }
 
         Refresh();

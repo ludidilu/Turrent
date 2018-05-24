@@ -43,6 +43,11 @@ namespace Turrent_lib
             if (state == TurrentState.CD)
             {
                 state = TurrentState.FREE;
+
+                if (parent.sds.GetIsSkill())
+                {
+                    parent.Die();
+                }
             }
 
             yield return Attack();
@@ -104,13 +109,13 @@ namespace Turrent_lib
                         }
                     }
 
-                    return new BattleAttackVO(pos, damageDataList);
+                    return new BattleAttackVO(parent.isMine, pos, damageDataList);
                 }
             }
 
             int baseDamage = battleCore.BaseBeDamage(this);
 
-            return new BattleAttackVO(pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
+            return new BattleAttackVO(parent.isMine, pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
         }
     }
 }

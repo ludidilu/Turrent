@@ -6,6 +6,7 @@ using System;
 using superFunction;
 using Turrent_lib;
 using superEnumerator;
+using superTween;
 
 public partial class BattleManager : MonoBehaviour
 {
@@ -24,16 +25,13 @@ public partial class BattleManager : MonoBehaviour
     private float cardGap = 5;
 
     [SerializeField]
+    private float yFix = 50;
+
+    [SerializeField]
     private Text mMoney;
 
     [SerializeField]
     private Text oMoney;
-
-    [SerializeField]
-    private Text mHp;
-
-    [SerializeField]
-    private Text oHp;
 
     [SerializeField]
     private BattleClickGo myPosRes;
@@ -48,7 +46,13 @@ public partial class BattleManager : MonoBehaviour
     private BattleUnit unitRes;
 
     [SerializeField]
+    private BattleBase baseRes;
+
+    [SerializeField]
     private BattleMouseDownGo clickBg;
+
+    [SerializeField]
+    private LineRenderer arrowRes;
 
     [HideInInspector]
     public GameObject eventGo;
@@ -56,6 +60,10 @@ public partial class BattleManager : MonoBehaviour
     private BattleClickGo[] mPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
     private BattleClickGo[] oPosArr = new BattleClickGo[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
+
+    private BattleBase mBase;
+
+    private BattleBase oBase;
 
     private Turrent[] mTurrent;
 
@@ -118,7 +126,7 @@ public partial class BattleManager : MonoBehaviour
 
                 mPosArr[id] = go;
 
-                (go.transform as RectTransform).anchoredPosition = new Vector2(-0.5f * screenWidth + width * 0.5f + m * width, -0.5f * turrentGap - 0.5f * width - i * width);
+                (go.transform as RectTransform).anchoredPosition = new Vector2(-0.5f * screenWidth + width * 0.5f + m * width, -0.5f * turrentGap - 0.5f * width - i * width + yFix);
 
                 SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
                 {
@@ -128,6 +136,14 @@ public partial class BattleManager : MonoBehaviour
                 SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.EVENT_NAME, dele);
             }
         }
+
+        mBase = Instantiate(baseRes);
+
+        mBase.transform.SetParent(transform, false);
+
+        mBase.gameObject.SetActive(true);
+
+        (mBase.transform as RectTransform).anchoredPosition = new Vector2(-0.5f * screenWidth + width * 0.5f + (float)(BattleConst.MAP_WIDTH - 1) / 2 * width, -0.5f * turrentGap - 0.5f * width - BattleConst.MAP_HEIGHT * width + yFix);
 
         for (int i = 0; i < BattleConst.MAP_HEIGHT; i++)
         {
@@ -147,7 +163,7 @@ public partial class BattleManager : MonoBehaviour
 
                 oPosArr[id] = go;
 
-                (go.transform as RectTransform).anchoredPosition = new Vector2(0.5f * screenWidth - width * 0.5f - m * width, 0.5f * turrentGap + 0.5f * width + i * width);
+                (go.transform as RectTransform).anchoredPosition = new Vector2(0.5f * screenWidth - width * 0.5f - m * width, 0.5f * turrentGap + 0.5f * width + i * width + yFix);
 
                 SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
                 {
@@ -157,6 +173,14 @@ public partial class BattleManager : MonoBehaviour
                 SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.EVENT_NAME, dele);
             }
         }
+
+        oBase = Instantiate(baseRes);
+
+        oBase.transform.SetParent(transform, false);
+
+        oBase.gameObject.SetActive(true);
+
+        (oBase.transform as RectTransform).anchoredPosition = new Vector2(0.5f * screenWidth - width * 0.5f - (float)(BattleConst.MAP_WIDTH - 1) / 2 * width, 0.5f * turrentGap + 0.5f * width + BattleConst.MAP_HEIGHT * width + yFix);
     }
 
     private void InitClickBg()
@@ -224,8 +248,6 @@ public partial class BattleManager : MonoBehaviour
     private void RefreshData()
     {
         initOver = true;
-
-        Debug.Log("refreshData");
 
         Reset();
 
@@ -430,16 +452,9 @@ public partial class BattleManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.A))
         {
-            List<int> handCards = battle.GetHandCards();
+            LineRenderer lr = Instantiate(arrowRes);
 
-            if (handCards.Count > 0)
-            {
-                int uid = handCards[0];
-
-                int result = battle.ClientRequestAddAction(uid, 2);
-
-                Debug.Log("result:" + result);
-            }
+            lr.SetPositions(new Vector3[] { mPosArr[0].transform.position, oPosArr[0].transform.position });
         }
         else if (Input.GetKeyUp(KeyCode.F5))
         {
@@ -456,6 +471,11 @@ public partial class BattleManager : MonoBehaviour
             needRefresh = true;
 
             ValueType ss = _superEnumerator.Current;
+
+            if (ss is BattleAttackVO)
+            {
+                ShowAttack((BattleAttackVO)ss);
+            }
         }
 
         if (needRefresh)
@@ -466,13 +486,86 @@ public partial class BattleManager : MonoBehaviour
         RefreshHpAndMoney();
     }
 
+    private void ShowAttack(BattleAttackVO _vo)
+    {
+        BattleClickGo[] mArr;
+
+        BattleClickGo[] oArr;
+
+        BattleBase targetBase;
+
+        if (battle.clientIsMine == _vo.isMine)
+        {
+            mArr = mPosArr;
+
+            oArr = oPosArr;
+
+            targetBase = oBase;
+        }
+        else
+        {
+            mArr = oPosArr;
+
+            oArr = mPosArr;
+
+            targetBase = mBase;
+        }
+
+        List<GameObject> list = null;
+
+        for (int i = 0; i < _vo.damageData.Count; i++)
+        {
+            KeyValuePair<int, int> pair = _vo.damageData[i];
+
+            if (pair.Key != -1)
+            {
+                LineRenderer lr = Instantiate(arrowRes);
+
+                lr.SetPositions(new Vector3[] { mArr[_vo.pos].transform.position, oArr[pair.Key].transform.position });
+
+                if (list == null)
+                {
+                    list = new List<GameObject>();
+                }
+
+                list.Add(lr.gameObject);
+            }
+            else
+            {
+                LineRenderer lr = Instantiate(arrowRes);
+
+                lr.SetPositions(new Vector3[] { mArr[_vo.pos].transform.position, targetBase.transform.position });
+
+                if (list == null)
+                {
+                    list = new List<GameObject>();
+                }
+
+                list.Add(lr.gameObject);
+            }
+        }
+
+        if (list != null)
+        {
+            Action dele = delegate ()
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    Destroy(list[i]);
+                }
+            };
+
+            SuperTween.Instance.DelayCall(0.1f, dele);
+        }
+    }
+
     private void RefreshHpAndMoney()
     {
         if (battle.clientIsMine)
         {
-            mHp.text = battle.mBase.ToString();
+            mBase.SetHp(battle.mBase);
 
-            oHp.text = battle.oBase.ToString();
+            oBase.SetHp(battle.oBase);
 
             mMoney.text = battle.mMoney.ToString();
 
@@ -480,9 +573,9 @@ public partial class BattleManager : MonoBehaviour
         }
         else
         {
-            mHp.text = battle.oBase.ToString();
+            mBase.SetHp(battle.oBase);
 
-            oHp.text = battle.mBase.ToString();
+            oBase.SetHp(battle.mBase);
 
             mMoney.text = battle.oMoney.ToString();
 

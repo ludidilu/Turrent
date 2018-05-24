@@ -7,6 +7,7 @@ public partial class UnitSDS : CsvBase, IUnitSDS
     public int[] turrent;
     public int hp;
     public int cost;
+    public bool isSkill;
 
     private ITurrentSDS[] turrentFix;
 
@@ -43,5 +44,10 @@ public partial class UnitSDS : CsvBase, IUnitSDS
     public int GetCost()
     {
         return cost;
+    }
+
+    public bool GetIsSkill()
+    {
+        return isSkill;
     }
 }

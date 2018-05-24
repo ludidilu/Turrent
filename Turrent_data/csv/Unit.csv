@@ -1,5 +1,7 @@
-编号,名字,可以放置的排,占用位置,炮台编号(对应占用位置),生命值,花费
-int,string,int[],int[],int[],int,int
-ID,name,row,pos,turrent,hp,cost
-1,pao,0$1,0,1,100,3
-2,pao2,0,0$1$2,1$1$1,200,5
+编号,名字,可以放置的排,占用位置,炮台编号(对应占用位置),生命值,花费,是否一次性
+int,string,int[],int[],int[],int,int,bool
+ID,name,row,pos,turrent,hp,cost,isSkill
+1,pao,0$1,0,1,100,3,0
+2,pao2,0,0$1$2,1$1$1,200,5,0
+3,pao3,0,0$1$5$6,1$1$1$1,150,4,0
+4,paor4,0$1,0,2,100,3,0

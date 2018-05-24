@@ -10,6 +10,8 @@
 
         private BattleCore battleCore;
 
+        public bool isDead { private set; get; }
+
         public void Init(BattleCore _battleCore, bool _isMine, IUnitSDS _sds)
         {
             battleCore = _battleCore;
@@ -26,6 +28,11 @@
             hp -= _turrent.sds.GetAttackDamage();
 
             return -_turrent.sds.GetAttackDamage();
+        }
+
+        internal void Die()
+        {
+            isDead = true;
         }
     }
 }
