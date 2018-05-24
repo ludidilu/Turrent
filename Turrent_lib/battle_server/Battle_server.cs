@@ -253,6 +253,8 @@ namespace Turrent_lib
             {
                 battle.AddAction(_isMine, uid, pos);
             }
+
+            serverSendDataCallBack(_isMine, false, new MemoryStream());
         }
 
         private void ServerQuitBattle(bool _isMine)

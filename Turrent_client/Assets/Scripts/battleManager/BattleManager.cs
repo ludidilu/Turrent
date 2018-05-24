@@ -47,6 +47,9 @@ public partial class BattleManager : MonoBehaviour
     [SerializeField]
     private BattleUnit unitRes;
 
+    [SerializeField]
+    private BattleMouseDownGo clickBg;
+
     [HideInInspector]
     public GameObject eventGo;
 
@@ -66,6 +69,8 @@ public partial class BattleManager : MonoBehaviour
 
     private Battle_client battle = new Battle_client();
 
+    private int nowSelectedCardUid = -1;
+
     private bool initOver;
 
     public void Init(GameObject _eventGo)
@@ -83,6 +88,8 @@ public partial class BattleManager : MonoBehaviour
         SuperFunction.Instance.AddEventListener<BinaryReader>(eventGo, BATTLE_RECEIVE_DATA, ReceiveData);
 
         InitPos();
+
+        InitClickBg();
     }
 
     private void InitPos()
@@ -118,7 +125,7 @@ public partial class BattleManager : MonoBehaviour
                     ClickMyPos(id);
                 };
 
-                SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.CLICK_EVENT, dele);
+                SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.EVENT_NAME, dele);
             }
         }
 
@@ -147,14 +154,46 @@ public partial class BattleManager : MonoBehaviour
                     ClickOppPos(id);
                 };
 
-                SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.CLICK_EVENT, dele);
+                SuperFunction.Instance.AddEventListener(go.gameObject, BattleClickGo.EVENT_NAME, dele);
             }
         }
+    }
+
+    private void InitClickBg()
+    {
+        SuperFunction.Instance.AddEventListener(clickBg.gameObject, BattleMouseDownGo.EVENT_NAME, BgMouseDown);
+    }
+
+    private void BgMouseDown(int _index)
+    {
+        Debug.Log("BgMouseDown");
+
+        nowSelectedCardUid = -1;
+
+        RefreshSelectedCard();
     }
 
     private void ClickMyPos(int _id)
     {
         Debug.Log("ClickMyPos:" + _id);
+
+        if (nowSelectedCardUid != -1)
+        {
+            int result = battle.CheckAddSummon(battle.clientIsMine, nowSelectedCardUid, _id);
+
+            Debug.Log("CheckAddSummon:" + result);
+
+            if (result == -1)
+            {
+                battle.ClientRequestAddAction(nowSelectedCardUid, _id);
+            }
+            else
+            {
+                nowSelectedCardUid = -1;
+
+                RefreshSelectedCard();
+            }
+        }
     }
 
     private void ClickOppPos(int _id)
@@ -193,6 +232,8 @@ public partial class BattleManager : MonoBehaviour
         InitCards();
 
         InitTurrent();
+
+        RefreshHpAndMoney();
     }
 
     private void Reset()
@@ -241,6 +282,8 @@ public partial class BattleManager : MonoBehaviour
 
             float y = -0.5f * screenHeight + size.y * 0.5f;
 
+            bool getSelectedCard = false;
+
             for (int i = 0; i < handCards.Count; i++)
             {
                 int uid = handCards[i];
@@ -262,16 +305,42 @@ public partial class BattleManager : MonoBehaviour
                     ClickCard(card);
                 };
 
-                SuperFunction.Instance.AddEventListener(card.gameObject, BattleClickGo.CLICK_EVENT, dele);
+                SuperFunction.Instance.AddEventListener(card.gameObject, BattleClickGo.EVENT_NAME, dele);
 
                 cards.Add(uid, card);
+
+                if (card.uid == nowSelectedCardUid)
+                {
+                    getSelectedCard = true;
+
+                    card.SetSelected(true);
+                }
+            }
+
+            if (!getSelectedCard)
+            {
+                nowSelectedCardUid = -1;
             }
         }
     }
 
     private void ClickCard(BattleCard _card)
     {
+        Debug.Log("ClickCard");
 
+        nowSelectedCardUid = _card.uid;
+
+        RefreshSelectedCard();
+    }
+
+    private void RefreshSelectedCard()
+    {
+        IEnumerator<BattleCard> enumerator = cards.Values.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            enumerator.Current.SetSelected(enumerator.Current.uid == nowSelectedCardUid);
+        }
     }
 
     private void InitTurrent()
@@ -394,6 +463,11 @@ public partial class BattleManager : MonoBehaviour
             RefreshData();
         }
 
+        RefreshHpAndMoney();
+    }
+
+    private void RefreshHpAndMoney()
+    {
         if (battle.clientIsMine)
         {
             mHp.text = battle.mBase.ToString();

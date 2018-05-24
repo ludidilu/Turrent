@@ -147,6 +147,8 @@ namespace Turrent_lib
                         {
                             if (turrent[_pos + pos] != null)
                             {
+                                Log.Write("ppp:" + (_pos + pos));
+
                                 return 6;
                             }
                         }
@@ -225,7 +227,7 @@ namespace Turrent_lib
 
                 turrent.Init(this, unit, sds, _pos + pos, time);
 
-                turrentPos[pos] = turrent;
+                turrentPos[_pos + pos] = turrent;
             }
         }
 
@@ -292,6 +294,8 @@ namespace Turrent_lib
 
             if (list.Count > 0)
             {
+                int lastProcessTime = -1;
+
                 while (true)
                 {
                     list.Sort(SortTurrentList);
@@ -302,14 +306,62 @@ namespace Turrent_lib
 
                     if (time >= turrent.time)
                     {
+                        if (lastProcessTime == -1)
+                        {
+                            lastProcessTime = turrent.time;
+                        }
+                        else if (turrent.time > lastProcessTime)
+                        {
+                            lastProcessTime = turrent.time;
+
+                            RemoveDieUnit();
+                        }
+
                         yield return turrent.Update();
                     }
                     else
                     {
+                        RemoveDieUnit();
+
                         break;
                     }
 
                     list.Add(turrent);
+                }
+            }
+        }
+
+        private void RemoveDieUnit()
+        {
+            for (int i = 0; i < mTurrent.Length; i++)
+            {
+                Turrent t = mTurrent[i];
+
+                if (t != null)
+                {
+                    if (t.parent.hp < 1)
+                    {
+                        for (int m = 0; m < t.parent.sds.GetPos().Length; m++)
+                        {
+                            mTurrent[i + t.parent.sds.GetPos()[m]] = null;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < oTurrent.Length; i++)
+            {
+                Turrent t = oTurrent[i];
+
+                if (t != null)
+                {
+                    if (t.parent.hp < 1)
+                    {
+                        for (int m = 0; m < t.parent.sds.GetPos().Length; m++)
+                        {
+                            oTurrent[i + t.parent.sds.GetPos()[m]] = null;
+                        }
+                    }
                 }
             }
         }

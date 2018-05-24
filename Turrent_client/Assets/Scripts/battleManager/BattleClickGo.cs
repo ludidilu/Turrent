@@ -4,10 +4,10 @@ using superFunction;
 
 public class BattleClickGo : MonoBehaviour, IPointerClickHandler
 {
-    public const string CLICK_EVENT = "battleCellClick";
+    public const string EVENT_NAME = "onClick";
 
     public void OnPointerClick(PointerEventData _data)
     {
-        SuperFunction.Instance.DispatchEvent(gameObject, CLICK_EVENT);
+        SuperFunction.Instance.DispatchEvent(gameObject, EVENT_NAME);
     }
 }
