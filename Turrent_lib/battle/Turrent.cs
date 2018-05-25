@@ -63,49 +63,67 @@ namespace Turrent_lib
 
             Turrent[] oppTurrent = parent.isMine ? battleCore.oTurrent : battleCore.mTurrent;
 
+            List<KeyValuePair<int, int>> damageDataList = new List<KeyValuePair<int, int>>();
+
+            bool getTarget = false;
+
             for (int i = 0; i < sds.GetAttackTargetPos().Length; i++)
             {
-                KeyValuePair<int, int> targetPosFix = sds.GetAttackTargetPos()[i];
+                KeyValuePair<int, int>[] targetPosFixArr = sds.GetAttackTargetPos()[i];
 
-                int targetX = oppX + targetPosFix.Key;
-
-                if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
+                for (int n = 0; n < targetPosFixArr.Length; n++)
                 {
-                    continue;
+                    KeyValuePair<int, int> targetPosFix = targetPosFixArr[n];
+
+                    int targetX = oppX + targetPosFix.Key;
+
+                    if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
+                    {
+                        continue;
+                    }
+
+                    int targetY = targetPosFix.Value;
+
+                    int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
+
+                    Turrent targetTurrent = oppTurrent[targetPos];
+
+                    if (targetTurrent != null)
+                    {
+                        getTarget = true;
+
+                        int damage = targetTurrent.BeDamage(this);
+
+                        damageDataList.Add(new KeyValuePair<int, int>(targetPos, damage));
+                    }
                 }
 
-                int targetY = targetPosFix.Value;
-
-                int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
-
-                if (oppTurrent[targetPos] != null)
+                if (getTarget)
                 {
-                    KeyValuePair<int, int>[] arr = sds.GetAttackDamagePos()[i];
-
-                    List<KeyValuePair<int, int>> damageDataList = new List<KeyValuePair<int, int>>();
+                    KeyValuePair<int, int>[] arr = sds.GetAttackSplashPos()[i];
 
                     for (int m = 0; m < arr.Length; m++)
                     {
-                        KeyValuePair<int, int> damagePosFix = arr[m];
+                        KeyValuePair<int, int> targetPosFix = arr[m];
 
-                        int damageX = oppX + damagePosFix.Key;
+                        int targetX = oppX + targetPosFix.Key;
 
-                        if (damageX >= BattleConst.MAP_WIDTH || damageX < 0)
+                        if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
                         {
                             continue;
                         }
 
-                        int damageY = damagePosFix.Value;
+                        int targetY = targetPosFix.Value;
 
-                        int damagePos = damageY * BattleConst.MAP_WIDTH + damageX;
+                        int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
 
-                        Turrent damageTurrent = oppTurrent[damagePos];
+                        Turrent targetTurrent = oppTurrent[targetPos];
 
-                        if (damageTurrent != null)
+                        if (targetTurrent != null)
                         {
-                            int damage = damageTurrent.BeDamage(this);
+                            int damage = targetTurrent.BeDamage(this);
 
-                            damageDataList.Add(new KeyValuePair<int, int>(damagePos, damage));
+                            damageDataList.Add(new KeyValuePair<int, int>(targetPos, damage));
                         }
                     }
 

@@ -133,6 +133,8 @@ public partial class BattleManager : MonoBehaviour
 
                 go.gameObject.SetActive(true);
 
+                go.SetHintVisible(false);
+
                 float scale = width / (go.transform as RectTransform).sizeDelta.x;
 
                 go.transform.localScale = new Vector3(scale, scale, 1);
