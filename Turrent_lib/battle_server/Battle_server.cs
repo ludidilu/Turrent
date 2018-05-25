@@ -236,8 +236,6 @@ namespace Turrent_lib
 
             int pos = _br.ReadInt32();
 
-            Log.Write("ServerDoAction:" + uid + "    " + pos);
-
             List<PlayerAction> list;
 
             if (!recordData.action.TryGetValue(tick, out list))

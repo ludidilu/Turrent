@@ -147,8 +147,6 @@ namespace Turrent_lib
                         {
                             if (turrent[_pos + pos] != null)
                             {
-                                Log.Write("ppp:" + (_pos + pos));
-
                                 return 6;
                             }
                         }

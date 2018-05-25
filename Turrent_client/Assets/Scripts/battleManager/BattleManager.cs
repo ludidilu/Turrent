@@ -343,18 +343,16 @@ public partial class BattleManager : MonoBehaviour
                 if (card.uid == nowSelectedCardUid)
                 {
                     getSelectedCard = true;
-
-                    card.SetSelected(true);
-                }
-                else
-                {
-                    card.SetSelected(false);
                 }
             }
 
             if (!getSelectedCard)
             {
                 nowSelectedCardUid = -1;
+            }
+            else
+            {
+                RefreshSelectedCard();
             }
         }
 
