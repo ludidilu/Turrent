@@ -8,6 +8,9 @@ public class TurrentCreaterField : MonoBehaviour
     [SerializeField]
     private TurrentCreaterCell cellRes;
 
+    [SerializeField]
+    private float yFix;
+
     private TurrentCreater parent;
 
     private Dictionary<KeyValuePair<int, int>, TurrentCreaterCell> cellDic = new Dictionary<KeyValuePair<int, int>, TurrentCreaterCell>();
@@ -40,7 +43,7 @@ public class TurrentCreaterField : MonoBehaviour
 
                 cell.transform.localScale = new Vector3(scale, scale, 1);
 
-                (cell.transform as RectTransform).anchoredPosition = new Vector2(0.5f * fieldWidth - width * 0.5f - m * width, 0.5f * width + i * width);
+                (cell.transform as RectTransform).anchoredPosition = new Vector2(0.5f * fieldWidth - width * 0.5f - m * width, 0.5f * width + i * width + yFix);
 
                 cellDic.Add(new KeyValuePair<int, int>(cell.x, cell.y), cell);
 

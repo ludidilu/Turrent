@@ -7,6 +7,5 @@
         ITurrentSDS[] GetTurrent();
         int GetHp();
         int GetCost();
-        bool GetIsSkill();
     }
 }

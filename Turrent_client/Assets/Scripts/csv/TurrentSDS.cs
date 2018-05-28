@@ -9,6 +9,7 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
     public int attackGap;
     public int attackDamage;
     public bool canAttackBase;
+    public int liveTime;
 
     private KeyValuePair<int, int>[][] attackTargetPosFix;
     private KeyValuePair<int, int>[][] attackSplashPosFix;
@@ -109,5 +110,10 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
     public bool GetCanAttackBase()
     {
         return canAttackBase;
+    }
+
+    public int GetLiveTime()
+    {
+        return liveTime;
     }
 }

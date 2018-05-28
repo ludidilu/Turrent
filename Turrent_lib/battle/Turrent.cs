@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections;
 
 namespace Turrent_lib
 {
@@ -23,6 +22,8 @@ namespace Turrent_lib
 
         private BattleCore battleCore;
 
+        public int bornTime { private set; get; }
+
         internal void Init(BattleCore _battleCore, Unit _parent, ITurrentSDS _sds, int _pos, int _time)
         {
             battleCore = _battleCore;
@@ -35,7 +36,9 @@ namespace Turrent_lib
 
             state = TurrentState.CD;
 
-            time = _time + sds.GetCd();
+            bornTime = _time;
+
+            time = bornTime + sds.GetCd();
         }
 
         internal bool Update(out BattleAttackVO _vo)
@@ -43,11 +46,6 @@ namespace Turrent_lib
             if (state == TurrentState.CD)
             {
                 state = TurrentState.FREE;
-
-                if (parent.sds.GetIsSkill())
-                {
-                    parent.Die();
-                }
             }
 
             bool b = Attack(out _vo);
@@ -156,7 +154,7 @@ namespace Turrent_lib
 
         private int BeDamage(Turrent _turrent)
         {
-            return parent.BeDamage(_turrent);
+            return parent.BeDamaged(_turrent);
         }
     }
 }

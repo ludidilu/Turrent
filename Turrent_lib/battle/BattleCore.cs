@@ -319,7 +319,7 @@ namespace Turrent_lib
                     }
                     else if (turrent.time > lastProcessTime)
                     {
-                        yield return RemoveDieUnit(list);
+                        yield return RemoveDieUnit(turrent.time, list);
 
                         lastProcessTime = -1;
                     }
@@ -345,10 +345,10 @@ namespace Turrent_lib
                 }
             }
 
-            yield return RemoveDieUnit(null);
+            yield return RemoveDieUnit(time, null);
         }
 
-        private IEnumerator RemoveDieUnit(List<Turrent> _list)
+        private IEnumerator RemoveDieUnit(int _time, List<Turrent> _list)
         {
             for (int i = 0; i < mTurrent.Length; i++)
             {
@@ -356,7 +356,7 @@ namespace Turrent_lib
 
                 if (t != null)
                 {
-                    if (t.parent.hp < 1 || t.parent.isDead)
+                    if (t.parent.hp < 1 || (t.sds.GetLiveTime() > 0 && _time >= t.bornTime + t.sds.GetLiveTime()))
                     {
                         if (_list != null)
                         {
@@ -376,7 +376,7 @@ namespace Turrent_lib
 
                 if (t != null)
                 {
-                    if (t.parent.hp < 1 || t.parent.isDead)
+                    if (t.parent.hp < 1 || (t.sds.GetLiveTime() > 0 && _time >= t.bornTime + t.sds.GetLiveTime()))
                     {
                         if (_list != null)
                         {

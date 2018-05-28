@@ -10,7 +10,7 @@
 
         public const int DEFAULT_MONEY = 5;
 
-        public const int DEFAULT_HP = 1000;
+        public const int DEFAULT_HP = 5000;
 
         public const int HAND_CARDS_NUM = 5;
 
