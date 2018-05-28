@@ -59,6 +59,7 @@
     <Compile Include="battle\BattleCore.cs" />
     <Compile Include="battle\BattlePublicTools.cs" />
     <Compile Include="battle\battleVO\BattleAttackVO.cs" />
+    <Compile Include="battle\battleVO\BattleDeadVO.cs" />
     <Compile Include="battle\battleVO\BattleSummonVO.cs" />
     <Compile Include="battle\Turrent.cs" />
     <Compile Include="battle\Unit.cs" />

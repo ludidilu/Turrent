@@ -304,29 +304,51 @@ namespace Turrent_lib
                     {
                         lastProcessTime = turrent.time;
 
-                        yield return turrent.Update();
+                        BattleAttackVO vo;
+
+                        bool b = turrent.Update(out vo);
+
+                        if (b)
+                        {
+                            yield return vo;
+                        }
+                        else
+                        {
+                            list.RemoveAt(0);
+                        }
                     }
                     else if (turrent.time > lastProcessTime)
                     {
-                        RemoveDieUnit(list);
+                        yield return RemoveDieUnit(list);
 
                         lastProcessTime = -1;
                     }
                     else
                     {
-                        yield return turrent.Update();
+                        BattleAttackVO vo;
+
+                        bool b = turrent.Update(out vo);
+
+                        if (b)
+                        {
+                            yield return vo;
+                        }
+                        else
+                        {
+                            list.RemoveAt(0);
+                        }
                     }
                 }
                 else
                 {
-                    RemoveDieUnit(null);
-
                     break;
                 }
             }
+
+            yield return RemoveDieUnit(null);
         }
 
-        private void RemoveDieUnit(List<Turrent> _list)
+        private IEnumerator RemoveDieUnit(List<Turrent> _list)
         {
             for (int i = 0; i < mTurrent.Length; i++)
             {
@@ -342,6 +364,8 @@ namespace Turrent_lib
                         }
 
                         mTurrent[i] = null;
+
+                        yield return new BattleDeadVO(true, i);
                     }
                 }
             }
@@ -360,6 +384,8 @@ namespace Turrent_lib
                         }
 
                         oTurrent[i] = null;
+
+                        yield return new BattleDeadVO(true, i);
                     }
                 }
             }

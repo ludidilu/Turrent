@@ -355,6 +355,10 @@ public partial class BattleManager : MonoBehaviour
                 RefreshSelectedCard();
             }
         }
+        else
+        {
+            nowSelectedCardUid = -1;
+        }
 
         while (cards.Count > handCards.Count)
         {

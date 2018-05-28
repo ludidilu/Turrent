@@ -9,5 +9,6 @@ namespace Turrent_lib
         KeyValuePair<int, int>[][] GetAttackSplashPos();
         int GetAttackGap();
         int GetAttackDamage();
+        bool GetCanAttackBase();
     }
 }

@@ -38,7 +38,7 @@ namespace Turrent_lib
             time = _time + sds.GetCd();
         }
 
-        internal IEnumerator Update()
+        internal bool Update(out BattleAttackVO _vo)
         {
             if (state == TurrentState.CD)
             {
@@ -50,12 +50,17 @@ namespace Turrent_lib
                 }
             }
 
-            yield return Attack();
+            bool b = Attack(out _vo);
 
-            time += sds.GetAttackGap();
+            if (b)
+            {
+                time += sds.GetAttackGap();
+            }
+
+            return b;
         }
 
-        private BattleAttackVO Attack()
+        private bool Attack(out BattleAttackVO _vo)
         {
             int x = pos % BattleConst.MAP_WIDTH;
 
@@ -127,13 +132,26 @@ namespace Turrent_lib
                         }
                     }
 
-                    return new BattleAttackVO(parent.isMine, pos, damageDataList);
+                    _vo = new BattleAttackVO(parent.isMine, pos, damageDataList);
+
+                    return true;
                 }
             }
 
-            int baseDamage = battleCore.BaseBeDamage(this);
+            if (sds.GetCanAttackBase())
+            {
+                int baseDamage = battleCore.BaseBeDamage(this);
 
-            return new BattleAttackVO(parent.isMine, pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
+                _vo = new BattleAttackVO(parent.isMine, pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
+
+                return true;
+            }
+            else
+            {
+                _vo = new BattleAttackVO();
+
+                return false;
+            }
         }
 
         private int BeDamage(Turrent _turrent)

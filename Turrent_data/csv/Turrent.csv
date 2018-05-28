@@ -1,7 +1,7 @@
-编号,攻击位置,溅射位置,冷却时间,攻击间隔,攻击伤害,图标,注释
-int,string[],string[],int,int,int,string,string
-ID,attackTargetPos,attackSplashPos,cd,attackGap,attackDamage,icon,comment
-1,0:0&-1:0&1:0$0:1&-1:1&1:1,$,1000,1500,1,a,
-2,0:0&-1:0&1:0$0:1&-1:1&1:1,$,1000,1530,1,a,
-3,0:0$0:1,$,2000,100000,100,a,
-10000000,,,0,0,0,,空炮台
+编号,攻击位置,溅射位置,冷却时间,攻击间隔,攻击伤害,是否攻击基地,图标,注释
+int,string[],string[],int,int,int,bool,string,string
+ID,attackTargetPos,attackSplashPos,cd,attackGap,attackDamage,canAttackBase,icon,comment
+1,0:0&-1:0&1:0$0:1&-1:1&1:1,$,1000,1500,1,1,a,
+2,0:0&-1:0&1:0$0:1&-1:1&1:1,$,1000,1530,1,1,a,
+3,0:0$0:1,$,2000,100000,100,0,a,
+10000000,,,0,0,0,0,,空炮台
