@@ -16,4 +16,11 @@ public class TurrentCreaterTargetCell : SuperListCell
 
         bg.color = selected ? Color.gray : Color.white;
     }
+
+    public override void SetIndex(int _index)
+    {
+        base.SetIndex(_index);
+
+        text.text = index.ToString();
+    }
 }

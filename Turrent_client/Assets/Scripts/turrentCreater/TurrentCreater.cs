@@ -2,9 +2,13 @@
 using UnityEngine;
 using superList;
 using UnityEngine.UI;
+using superFunction;
 
 public class TurrentCreater : MonoBehaviour
 {
+    [SerializeField]
+    private int scoreTimeLong;
+
     [SerializeField]
     private SuperList superList;
 
@@ -26,11 +30,14 @@ public class TurrentCreater : MonoBehaviour
     [SerializeField]
     private Text score;
 
-    private int cdValue;
+    [SerializeField]
+    private Toggle canAttackBase;
 
-    private int attackGapValue;
+    [SerializeField]
+    private BattleMouseDownGo outputBg;
 
-    private int attackDamageValue;
+    [SerializeField]
+    private InputField output;
 
     private List<KeyValuePair<List<KeyValuePair<int, int>>, List<KeyValuePair<int, int>>>> list = new List<KeyValuePair<List<KeyValuePair<int, int>>, List<KeyValuePair<int, int>>>>();
 
@@ -52,11 +59,75 @@ public class TurrentCreater : MonoBehaviour
         attackGap.onValueChanged.AddListener(ValueChange);
 
         attackDamage.onValueChanged.AddListener(ValueChange);
+
+        canAttackBase.onValueChanged.AddListener(ValueChange);
+
+        SuperFunction.Instance.AddEventListener(outputBg.gameObject, BattleMouseDownGo.EVENT_NAME, OutputBgDown);
+
+        GetScore();
+    }
+
+    private void OutputBgDown(int _index)
+    {
+        outputBg.gameObject.SetActive(false);
     }
 
     private void ValueChange(string _str)
     {
+        GetScore();
+    }
 
+    private void ValueChange(bool _b)
+    {
+        GetScore();
+    }
+
+    public void GetScore()
+    {
+        int cdValue = string.IsNullOrEmpty(cd.text) ? 0 : int.Parse(cd.text);
+
+        int attackGapValue = string.IsNullOrEmpty(attackGap.text) ? 0 : int.Parse(attackGap.text);
+
+        int attackDamageValue = string.IsNullOrEmpty(attackDamage.text) ? 0 : int.Parse(attackDamage.text);
+
+        if (attackGapValue == 0 || attackDamageValue == 0)
+        {
+            score.text = "0";
+        }
+        else
+        {
+            float targetNum = 0;
+
+            if (list.Count > 0)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var pair = list[i];
+
+                    float num = pair.Key.Count + pair.Value.Count;
+
+                    targetNum += Mathf.Sqrt(num);
+                }
+
+                targetNum /= list.Count;
+            }
+
+            if (canAttackBase.isOn)
+            {
+                targetNum += 1;
+            }
+
+            if (targetNum > 0)
+            {
+                int scoreValue = (int)(targetNum * attackDamageValue * ((scoreTimeLong - cdValue) / attackGapValue));
+
+                score.text = scoreValue.ToString();
+            }
+            else
+            {
+                score.text = "0";
+            }
+        }
     }
 
     private void Choose(int _index)
@@ -88,6 +159,8 @@ public class TurrentCreater : MonoBehaviour
         list.RemoveAt(superList.GetSelectedIndex());
 
         superList.SetData(list);
+
+        GetScore();
     }
 
     public void Close()
@@ -146,6 +219,12 @@ public class TurrentCreater : MonoBehaviour
             }
         }
 
+        string result = targetStr + "," + splashStr + "," + (string.IsNullOrEmpty(cd.text) ? "0" : cd.text) + "," + (string.IsNullOrEmpty(attackGap.text) ? "0" : attackGap.text) + "," + (string.IsNullOrEmpty(attackDamage.text) ? "0" : attackDamage.text) + "," + (canAttackBase.isOn ? "1" : "0") + "," + score.text;
+
         Debug.Log(targetStr + "," + splashStr);
+
+        outputBg.gameObject.SetActive(true);
+
+        output.text = result;
     }
 }

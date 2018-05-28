@@ -76,6 +76,8 @@ public class TurrentCreaterField : MonoBehaviour
 
             data.Value.Remove(new KeyValuePair<int, int>(_cell.x, _cell.y));
         }
+
+        parent.GetScore();
     }
 
     public void Show(KeyValuePair<List<KeyValuePair<int, int>>, List<KeyValuePair<int, int>>> _data)
