@@ -60,40 +60,27 @@ namespace Turrent_lib
 
         private bool Attack(out BattleAttackVO _vo)
         {
-            int x = pos % BattleConst.MAP_WIDTH;
+            List<int> result = BattlePublicTools.GetTurrentAttackTargetList(battleCore, parent.isMine, sds, pos);
 
-            int oppX = BattleConst.MAP_WIDTH - 1 - x;
-
-            Turrent[] oppTurrent = parent.isMine ? battleCore.oTurrent : battleCore.mTurrent;
-
-            List<KeyValuePair<int, int>> damageDataList = new List<KeyValuePair<int, int>>();
-
-            bool getTarget = false;
-
-            for (int i = 0; i < sds.GetAttackTargetPos().Length; i++)
+            if (result != null)
             {
-                KeyValuePair<int, int>[] targetPosFixArr = sds.GetAttackTargetPos()[i];
+                Turrent[] oppTurrent = parent.isMine ? battleCore.oTurrent : battleCore.mTurrent;
 
-                for (int n = 0; n < targetPosFixArr.Length; n++)
+                List<KeyValuePair<int, int>> damageDataList = new List<KeyValuePair<int, int>>();
+
+                for (int i = 0; i < result.Count; i++)
                 {
-                    KeyValuePair<int, int> targetPosFix = targetPosFixArr[n];
+                    int targetPos = result[i];
 
-                    int targetX = oppX + targetPosFix.Key;
-
-                    if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
+                    if (targetPos < 0)
                     {
-                        continue;
+                        int damage = battleCore.BaseBeDamage(this);
+
+                        damageDataList.Add(new KeyValuePair<int, int>(-1, damage));
                     }
-
-                    int targetY = targetPosFix.Value;
-
-                    int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
-
-                    Turrent targetTurrent = oppTurrent[targetPos];
-
-                    if (targetTurrent != null)
+                    else
                     {
-                        getTarget = true;
+                        Turrent targetTurrent = oppTurrent[targetPos];
 
                         int damage = targetTurrent.BeDamage(this);
 
@@ -101,46 +88,7 @@ namespace Turrent_lib
                     }
                 }
 
-                if (getTarget)
-                {
-                    KeyValuePair<int, int>[] arr = sds.GetAttackSplashPos()[i];
-
-                    for (int m = 0; m < arr.Length; m++)
-                    {
-                        KeyValuePair<int, int> targetPosFix = arr[m];
-
-                        int targetX = oppX + targetPosFix.Key;
-
-                        if (targetX >= BattleConst.MAP_WIDTH || targetX < 0)
-                        {
-                            continue;
-                        }
-
-                        int targetY = targetPosFix.Value;
-
-                        int targetPos = targetY * BattleConst.MAP_WIDTH + targetX;
-
-                        Turrent targetTurrent = oppTurrent[targetPos];
-
-                        if (targetTurrent != null)
-                        {
-                            int damage = targetTurrent.BeDamage(this);
-
-                            damageDataList.Add(new KeyValuePair<int, int>(targetPos, damage));
-                        }
-                    }
-
-                    _vo = new BattleAttackVO(parent.isMine, pos, damageDataList);
-
-                    return true;
-                }
-            }
-
-            if (sds.GetCanAttackBase())
-            {
-                int baseDamage = battleCore.BaseBeDamage(this);
-
-                _vo = new BattleAttackVO(parent.isMine, pos, new List<KeyValuePair<int, int>>() { new KeyValuePair<int, int>(-1, baseDamage) });
+                _vo = new BattleAttackVO(parent.isMine, pos, damageDataList);
 
                 return true;
             }
@@ -155,6 +103,21 @@ namespace Turrent_lib
         private int BeDamage(Turrent _turrent)
         {
             return parent.BeDamaged(_turrent);
+        }
+
+        public string GetData()
+        {
+            string str = string.Empty;
+
+            str += parent.GetData();
+
+            str += "pos:" + pos + ";";
+
+            str += "time:" + time + ";";
+
+            str += "bornTime:" + bornTime + ";";
+
+            return str;
         }
     }
 }

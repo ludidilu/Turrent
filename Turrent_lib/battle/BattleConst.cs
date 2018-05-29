@@ -18,6 +18,6 @@
 
         public const int MAX_MONEY = 10;
 
-        public const int RECOVER_MONEY_TIME = 2000;
+        public const int RECOVER_MONEY_TIME = 4000;
     }
 }

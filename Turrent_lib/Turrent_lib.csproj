@@ -48,6 +48,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="bt">
+      <HintPath>..\..\bt\bin\x64\Debug\bt.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Turrent_lib_dummy">
@@ -55,6 +58,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ai\AiSummonData.cs" />
+    <Compile Include="ai\BattleAi.cs" />
+    <Compile Include="ai\node\CheckDoSummonConditionNode.cs" />
+    <Compile Include="ai\node\GetSummonIdConditionNode.cs" />
+    <Compile Include="ai\node\GetSummonPosConditionNode.cs" />
+    <Compile Include="ai\node\SummonActionNode.cs" />
     <Compile Include="battle\BattleConst.cs" />
     <Compile Include="battle\BattleCore.cs" />
     <Compile Include="battle\BattlePublicTools.cs" />
@@ -73,5 +82,6 @@
     <Compile Include="superEnumerator\SuperEnumerator.cs" />
     <Compile Include="tuple\Tuple.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

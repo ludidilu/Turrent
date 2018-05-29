@@ -83,10 +83,7 @@ namespace Turrent_lib
                 {
                     SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(Update());
 
-                    while (superEnumerator.MoveNext())
-                    {
-
-                    }
+                    superEnumerator.Done();
                 }
 
                 int num2 = _br.ReadInt32();
@@ -107,10 +104,7 @@ namespace Turrent_lib
             {
                 SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(Update());
 
-                while (superEnumerator.MoveNext())
-                {
-
-                }
+                superEnumerator.Done();
             }
 
             clientRefreshDataCallBack();
@@ -151,6 +145,18 @@ namespace Turrent_lib
                     int id = _br.ReadInt32();
 
                     SetCard(isMine, uid, id);
+                }
+            }
+
+            if (serverProcessBattle)
+            {
+                string serverStr = _br.ReadString();
+
+                string clientStr = GetData();
+
+                if (serverStr != clientStr)
+                {
+                    throw new Exception("serverStr:" + serverStr + "  clientStr:" + clientStr);
                 }
             }
 

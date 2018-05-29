@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using Connection;
 using Turrent_lib;
@@ -67,6 +68,10 @@ namespace Turrent_server
             Dictionary<int, UnitSDS> unitDic = StaticData.GetDic<UnitSDS>();
 
             BattleCore.Init(unitDic, turrendDic);
+
+            string summonStr = File.ReadAllText(ConfigDictionary.Instance.ai_path + "ai_summon.xml");
+
+            BattleAi.Init(summonStr);
         }
     }
 }

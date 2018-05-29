@@ -20,5 +20,6 @@ public class ConfigDictionary : Config
     }
 
     public string table_path;
+    public string ai_path;
     public int port;
 }

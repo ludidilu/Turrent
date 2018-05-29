@@ -7,18 +7,18 @@ namespace Turrent_lib
 {
     public class BattleCore
     {
-        public static Func<int, IUnitSDS> getUnitData;
+        public static Func<int, IUnitSDS> GetUnitData;
 
-        public static Func<int, ITurrentSDS> getTurrentData;
+        public static Func<int, ITurrentSDS> GetTurrentData;
 
         public static void Init<T, U>(Dictionary<int, T> _unitDic, Dictionary<int, U> _turrentDic) where T : IUnitSDS where U : ITurrentSDS
         {
-            getUnitData = delegate (int _id)
+            GetUnitData = delegate (int _id)
             {
                 return _unitDic[_id];
             };
 
-            getTurrentData = delegate (int _id)
+            GetTurrentData = delegate (int _id)
             {
                 return _turrentDic[_id];
             };
@@ -124,7 +124,7 @@ namespace Turrent_lib
             {
                 int unitID = GetCard(_isMine, _uid);
 
-                IUnitSDS sds = getUnitData(unitID);
+                IUnitSDS sds = GetUnitData(unitID);
 
                 if (sds.GetCost() > money)
                 {
@@ -175,7 +175,7 @@ namespace Turrent_lib
 
             int unitID = GetCard(_isMine, _uid);
 
-            IUnitSDS sds = getUnitData(unitID);
+            IUnitSDS sds = GetUnitData(unitID);
 
             if (_isMine)
             {
@@ -407,7 +407,7 @@ namespace Turrent_lib
                     }
                     else
                     {
-                        throw new Exception("m summon error");
+                        throw new Exception("summon error   isMine:" + t.first + "  uid:" + t.second + "  pos:" + t.third + "  result:" + result);
                     }
                 }
 
@@ -510,6 +510,45 @@ namespace Turrent_lib
             mMoneyTime = 0;
 
             oMoneyTime = 0;
+        }
+
+        public string GetData()
+        {
+            string str = string.Empty;
+
+            str += tick + "{";
+
+            for (int i = 0; i < mTurrent.Length; i++)
+            {
+                Turrent t = mTurrent[i];
+
+                if (t != null)
+                {
+                    str += i + ":";
+
+                    str += t.GetData();
+
+                    str += "|";
+                }
+            }
+
+            for (int i = 0; i < oTurrent.Length; i++)
+            {
+                Turrent t = oTurrent[i];
+
+                if (t != null)
+                {
+                    str += i + ":";
+
+                    str += t.GetData();
+
+                    str += "|";
+                }
+            }
+
+            str += "}";
+
+            return str;
         }
     }
 }

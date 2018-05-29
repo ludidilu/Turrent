@@ -27,5 +27,16 @@
 
             return -_turrent.sds.GetAttackDamage();
         }
+
+        internal string GetData()
+        {
+            string str = string.Empty;
+
+            str += isMine + ";";
+
+            str += hp + ";";
+
+            return str;
+        }
     }
 }

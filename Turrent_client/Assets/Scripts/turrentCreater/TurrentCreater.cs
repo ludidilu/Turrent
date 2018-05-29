@@ -257,6 +257,11 @@ public class TurrentCreater : MonoBehaviour
             }
         }
 
+        if (!string.IsNullOrEmpty(targetStr) && string.IsNullOrEmpty(splashStr))
+        {
+            splashStr = "^";
+        }
+
         string result = targetStr + "," + splashStr + "," + (string.IsNullOrEmpty(cd.text) ? "0" : cd.text) + "," + (string.IsNullOrEmpty(liveTime.text) ? "0" : liveTime.text) + "," + (string.IsNullOrEmpty(attackGap.text) ? "0" : attackGap.text) + "," + (string.IsNullOrEmpty(attackDamage.text) ? "0" : attackDamage.text) + "," + (canAttackBase.isOn ? "1" : "0") + "," + score.text;
 
         outputBg.gameObject.SetActive(true);

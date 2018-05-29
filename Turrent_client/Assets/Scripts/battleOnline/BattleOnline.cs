@@ -108,6 +108,17 @@ public class BattleOnline : UIPanel
         }
     }
 
+    public void EnterPVE()
+    {
+        BattleManagerActionMessage message = new BattleManagerActionMessage();
+
+        message.BattleManagerAction = BattleManagerActionEnum.Pve;
+
+        message.BattleId = 2;
+
+        SendAction<PlayerStateMessage>(CsPackageTag.BattleManagerAction, message.ToByteArray(), ReceiveReplyData);
+    }
+
     public void EnterPVP()
     {
         BattleManagerActionMessage message = new BattleManagerActionMessage();

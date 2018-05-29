@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using superEnumerator;
+using bt;
 
 namespace Turrent_lib
 {
     public class Battle_server
     {
-        private static readonly Random random = new Random();
-
         private struct PlayerAction
         {
             public bool isMine;
@@ -55,6 +54,8 @@ namespace Turrent_lib
 
             public bool isVsAi;
         }
+
+        private static readonly Random random = new Random();
 
         private BattleRecordData recordData;
 
@@ -396,6 +397,13 @@ namespace Turrent_lib
                             oBw.Write(0);
                         }
 
+                        if (processBattle || recordData.isVsAi)
+                        {
+                            mBw.Write(battle.GetData());
+
+                            oBw.Write(battle.GetData());
+                        }
+
                         serverSendDataCallBack(true, true, mMs);
 
                         serverSendDataCallBack(false, true, oMs);
@@ -414,6 +422,11 @@ namespace Turrent_lib
 
                         bw.Write(0);
 
+                        if (processBattle || recordData.isVsAi)
+                        {
+                            bw.Write(battle.GetData());
+                        }
+
                         serverSendDataCallBack(true, true, ms);
 
                         serverSendDataCallBack(false, true, ms);
@@ -428,6 +441,26 @@ namespace Turrent_lib
                 SuperEnumerator<ValueType> superEnumerator = new SuperEnumerator<ValueType>(battle.Update());
 
                 superEnumerator.Done();
+
+                if (recordData.isVsAi)
+                {
+                    int uid;
+
+                    int pos;
+
+                    BattleAi.Start(battle, false, random.Next, out uid, out pos);
+
+                    if (uid != -1)
+                    {
+                        List<PlayerAction> tmpList = new List<PlayerAction>();
+
+                        recordData.action.Add(tick, tmpList);
+
+                        tmpList.Add(new PlayerAction(false, uid, pos));
+
+                        battle.AddAction(false, uid, pos);
+                    }
+                }
             }
         }
 
