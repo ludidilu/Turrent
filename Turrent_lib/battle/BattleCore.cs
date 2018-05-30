@@ -183,10 +183,8 @@ namespace Turrent_lib
             }
         }
 
-        private BattleSummonVO AddSummon(bool _isMine, int _uid, int _pos)
+        private BattleSummonVO AddSummon(int _time, bool _isMine, int _uid, int _pos)
         {
-            int time = tick * BattleConst.TICK_TIME;
-
             int unitID = GetCard(_isMine, _uid);
 
             IUnitSDS sds = GetUnitData(unitID);
@@ -195,7 +193,7 @@ namespace Turrent_lib
             {
                 if (mMoney == BattleConst.MAX_MONEY)
                 {
-                    mMoneyTime = time + BattleConst.RECOVER_MONEY_TIME;
+                    mMoneyTime = _time + BattleConst.RECOVER_MONEY_TIME;
                 }
 
                 mMoney -= sds.GetCost();
@@ -210,7 +208,7 @@ namespace Turrent_lib
             {
                 if (oMoney == BattleConst.MAX_MONEY)
                 {
-                    oMoneyTime = time + BattleConst.RECOVER_MONEY_TIME;
+                    oMoneyTime = _time + BattleConst.RECOVER_MONEY_TIME;
                 }
 
                 oMoney -= sds.GetCost();
@@ -222,15 +220,13 @@ namespace Turrent_lib
                 oHandCards.Add(oCards.Dequeue());
             }
 
-            AddUnit(_isMine, sds, _pos);
+            AddUnit(_time, _isMine, sds, _pos);
 
             return new BattleSummonVO(_isMine, _uid, _pos);
         }
 
-        private void AddUnit(bool _isMine, IUnitSDS _sds, int _pos)
+        private void AddUnit(int _time, bool _isMine, IUnitSDS _sds, int _pos)
         {
-            int time = tick * BattleConst.TICK_TIME;
-
             Turrent[] turrentPos = _isMine ? mTurrent : oTurrent;
 
             Unit unit = new Unit();
@@ -245,7 +241,7 @@ namespace Turrent_lib
 
                 Turrent turrent = new Turrent();
 
-                turrent.Init(this, unit, sds, _pos + pos, time);
+                turrent.Init(this, unit, sds, _pos + pos, _time);
 
                 turrentPos[_pos + pos] = turrent;
             }
@@ -279,17 +275,17 @@ namespace Turrent_lib
         {
             tick++;
 
-            yield return UpdateAction();
-
-            yield return UpdateRecoverMoney();
-
-            yield return UpdateTurrent();
-        }
-
-        private IEnumerator UpdateTurrent()
-        {
             int time = tick * BattleConst.TICK_TIME;
 
+            yield return UpdateAction(time);
+
+            yield return UpdateRecoverMoney(time);
+
+            yield return UpdateTurrent(time);
+        }
+
+        private IEnumerator UpdateTurrent(int _time)
+        {
             List<Turrent> list = new List<Turrent>();
 
             for (int i = 0; i < mTurrent.Length; i++)
@@ -322,7 +318,7 @@ namespace Turrent_lib
 
                 Turrent turrent = list[0];
 
-                if (time >= turrent.time)
+                if (_time >= turrent.time)
                 {
                     if (lastProcessTime == -1)
                     {
@@ -378,9 +374,9 @@ namespace Turrent_lib
 
             if (result == BattleResult.NOT_OVER)
             {
-                yield return RemoveDieUnit(time, null);
+                yield return RemoveDieUnit(_time, null);
 
-                result = GetBattleResult(time);
+                result = GetBattleResult(_time);
             }
 
             yield return new BattleResultVO(result);
@@ -456,7 +452,7 @@ namespace Turrent_lib
             }
         }
 
-        private IEnumerator UpdateAction()
+        private IEnumerator UpdateAction(int _time)
         {
             if (actionList.Count > 0)
             {
@@ -468,7 +464,7 @@ namespace Turrent_lib
 
                     if (result < 0)
                     {
-                        yield return AddSummon(t.first, t.second, t.third);
+                        yield return AddSummon(_time, t.first, t.second, t.third);
                     }
                     else
                     {
@@ -480,11 +476,9 @@ namespace Turrent_lib
             }
         }
 
-        private IEnumerator UpdateRecoverMoney()
+        private IEnumerator UpdateRecoverMoney(int _time)
         {
-            int time = tick * BattleConst.TICK_TIME;
-
-            while (mMoney < BattleConst.MAX_MONEY && time >= mMoneyTime)
+            while (mMoney < BattleConst.MAX_MONEY && _time >= mMoneyTime)
             {
                 mMoney++;
 
@@ -493,7 +487,7 @@ namespace Turrent_lib
                 yield return new BattleRecoverMoneyVO(true);
             }
 
-            while (oMoney < BattleConst.MAX_MONEY && time >= oMoneyTime)
+            while (oMoney < BattleConst.MAX_MONEY && _time >= oMoneyTime)
             {
                 oMoney++;
 

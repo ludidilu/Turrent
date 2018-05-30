@@ -207,7 +207,7 @@ public class BattleOnline : UIPanel
 
     private void Disconnect()
     {
-
+        Quit();
     }
 
     public void BattleOver(int _index)

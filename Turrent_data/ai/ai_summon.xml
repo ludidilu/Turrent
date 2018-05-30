@@ -1,5 +1,5 @@
 <sequence>
-	<condition type="Turrent_lib.CheckDoSummonConditionNode" value = "20"/>
+	<condition type="Turrent_lib.CheckDoSummonConditionNode" value = "40"/>
 	<condition type="Turrent_lib.GetSummonIdConditionNode"/>
 	<condition type="Turrent_lib.GetSummonPosConditionNode" turrentTargetScore="5" baseTargetScore="1"/>
 	<action type="Turrent_lib.SummonActionNode"/>
