@@ -20,9 +20,9 @@ namespace Turrent_lib
 
         internal int time { private set; get; }
 
-        private BattleCore battleCore;
+        internal int dieTime { private set; get; }
 
-        public int bornTime { private set; get; }
+        private BattleCore battleCore;
 
         internal void Init(BattleCore _battleCore, Unit _parent, ITurrentSDS _sds, int _pos, int _time)
         {
@@ -36,9 +36,12 @@ namespace Turrent_lib
 
             state = TurrentState.CD;
 
-            bornTime = _time;
+            time = _time + sds.GetCd();
 
-            time = bornTime + sds.GetCd();
+            if (sds.GetLiveTime() > 0)
+            {
+                dieTime = _time + sds.GetLiveTime();
+            }
         }
 
         internal bool Update(out BattleAttackVO _vo)
@@ -115,7 +118,7 @@ namespace Turrent_lib
 
             str += "time:" + time + ";";
 
-            str += "bornTime:" + bornTime + ";";
+            str += "dieTime:" + dieTime + ";";
 
             return str;
         }

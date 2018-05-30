@@ -56,7 +56,13 @@ namespace Turrent_lib
 
             int[] oCards = new int[num];
 
-            Init(mCards, oCards);
+            int mBase = _br.ReadInt32();
+
+            int oBase = _br.ReadInt32();
+
+            int maxTime = _br.ReadInt32();
+
+            Init(mCards, oCards, mBase, oBase, maxTime);
 
             int nowTick = _br.ReadInt32();
 

@@ -7,7 +7,7 @@ internal class BattleManager
 {
     public static BattleManager Instance;
 
-    private const int PVP_BATTLE_ID = 2;
+    private const int PVP_BATTLE_ID = 1;
 
     private const bool processBattle = true;
 
@@ -138,7 +138,7 @@ internal class BattleManager
 
                     battleSDS = StaticData.GetData<BattleSDS>(PVP_BATTLE_ID);
 
-                    battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, false);
+                    battleUnit.Init(_playerUnit, tmpPlayer, battleSDS.mCards, battleSDS.oCards, battleSDS.mBase, battleSDS.oBase, battleSDS.maxTime, false);
 
                     ReplyClient(_playerUnit, false, PlayerStateEnum.Battle);
 
@@ -164,7 +164,7 @@ internal class BattleManager
 
                 battleSDS = StaticData.GetData<BattleSDS>(battleID);
 
-                battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, true);
+                battleUnit.Init(_playerUnit, -1, battleSDS.mCards, battleSDS.oCards, battleSDS.mBase, battleSDS.oBase, battleSDS.maxTime, true);
 
                 ReplyClient(_playerUnit, false, PlayerStateEnum.Battle);
 
@@ -216,6 +216,8 @@ internal class BattleManager
         {
             battleDic.Remove(_oPlayer);
         }
+
+        battleList.Remove(_battleUnit);
 
         ReleaseBattleUnit(_battleUnit);
     }

@@ -261,7 +261,9 @@ public partial class BattleManager : MonoBehaviour
 
         InitTurrent();
 
-        RefreshHpAndMoney();
+        RefreshBaseHp();
+
+        RefreshMoney();
     }
 
     private void Reset()
@@ -562,13 +564,33 @@ public partial class BattleManager : MonoBehaviour
 
         while (_superEnumerator.MoveNext())
         {
-            needRefresh = true;
-
             ValueType ss = _superEnumerator.Current;
 
             if (ss is BattleAttackVO)
             {
                 ShowAttack((BattleAttackVO)ss);
+
+                needRefresh = true;
+            }
+            else if (ss is BattleDeadVO)
+            {
+                needRefresh = true;
+            }
+            else if (ss is BattleSummonVO)
+            {
+                needRefresh = true;
+            }
+            else if (ss is BattleRecoverMoneyVO)
+            {
+                RefreshMoney();
+            }
+            else if (ss is BattleResultVO)
+            {
+
+            }
+            else
+            {
+                throw new Exception("unknown vo:" + ss.GetType().Name);
             }
         }
 
@@ -577,7 +599,12 @@ public partial class BattleManager : MonoBehaviour
             RefreshData();
         }
 
-        RefreshHpAndMoney();
+        BattleResult result = ((BattleResultVO)_superEnumerator.Current).result;
+
+        if (result != BattleResult.NOT_OVER)
+        {
+            Reset();
+        }
     }
 
     private void ShowAttack(BattleAttackVO _vo)
@@ -653,27 +680,35 @@ public partial class BattleManager : MonoBehaviour
         }
     }
 
-    private void RefreshHpAndMoney()
+    private void RefreshMoney()
     {
         if (battle.clientIsMine)
         {
-            mBase.SetHp(battle.mBase);
-
-            oBase.SetHp(battle.oBase);
-
             mMoney.text = battle.mMoney.ToString();
 
             oMoney.text = battle.oMoney.ToString();
         }
         else
         {
-            mBase.SetHp(battle.oBase);
-
-            oBase.SetHp(battle.mBase);
-
             mMoney.text = battle.oMoney.ToString();
 
             oMoney.text = battle.mMoney.ToString();
+        }
+    }
+
+    private void RefreshBaseHp()
+    {
+        if (battle.clientIsMine)
+        {
+            mBase.SetHp(battle.mBase);
+
+            oBase.SetHp(battle.oBase);
+        }
+        else
+        {
+            mBase.SetHp(battle.oBase);
+
+            oBase.SetHp(battle.mBase);
         }
     }
 }

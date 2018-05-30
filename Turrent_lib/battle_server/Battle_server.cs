@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using superEnumerator;
-using bt;
 
 namespace Turrent_lib
 {
@@ -52,6 +51,12 @@ namespace Turrent_lib
 
             public int[] oCards;
 
+            public int mBase;
+
+            public int oBase;
+
+            public int maxTime;
+
             public bool isVsAi;
         }
 
@@ -75,6 +80,8 @@ namespace Turrent_lib
 
         private Action<bool, bool, MemoryStream> serverSendDataCallBack;
 
+        private Action<BattleResult> battleOverCallBack;
+
         public Battle_server(bool _processBattle)
         {
             processBattle = _processBattle;
@@ -82,12 +89,14 @@ namespace Turrent_lib
             battle = new BattleCore();
         }
 
-        public void ServerSetCallBack(Action<bool, bool, MemoryStream> _serverSendDataCallBack)
+        public void ServerSetCallBack(Action<bool, bool, MemoryStream> _serverSendDataCallBack, Action<BattleResult> _battleOverCallBack)
         {
             serverSendDataCallBack = _serverSendDataCallBack;
+
+            battleOverCallBack = _battleOverCallBack;
         }
 
-        public void ServerStart(IList<int> _mCards, IList<int> _oCards, bool _isVsAi)
+        public void ServerStart(IList<int> _mCards, IList<int> _oCards, int _mBase, int _oBase, int _maxTime, bool _isVsAi)
         {
             Log.Write("Battle Start!");
 
@@ -97,6 +106,12 @@ namespace Turrent_lib
 
             recordData.isVsAi = _isVsAi;
 
+            recordData.mBase = _mBase;
+
+            recordData.oBase = _oBase;
+
+            recordData.maxTime = _maxTime;
+
             InitCards(recordData, _mCards, _oCards);
 
             mCardsShowNum = Math.Min(BattleConst.HAND_CARDS_NUM, recordData.mCards.Length);
@@ -105,7 +120,7 @@ namespace Turrent_lib
 
             if (processBattle || recordData.isVsAi)
             {
-                battle.Init(recordData.mCards, recordData.oCards);
+                battle.Init(recordData.mCards, recordData.oCards, recordData.mBase, recordData.oBase, recordData.maxTime);
             }
         }
 
@@ -156,6 +171,12 @@ namespace Turrent_lib
                     bw.Write(recordData.mCards.Length);
 
                     bw.Write(recordData.oCards.Length);
+
+                    bw.Write(recordData.mBase);
+
+                    bw.Write(recordData.oBase);
+
+                    bw.Write(recordData.maxTime);
 
                     bw.Write(tick);
 
@@ -442,24 +463,35 @@ namespace Turrent_lib
 
                 superEnumerator.Done();
 
-                if (recordData.isVsAi)
+                BattleResult result = ((BattleResultVO)superEnumerator.Current).result;
+
+                if (result == BattleResult.NOT_OVER)
                 {
-                    int uid;
-
-                    int pos;
-
-                    BattleAi.Start(battle, false, random.Next, out uid, out pos);
-
-                    if (uid != -1)
+                    if (recordData.isVsAi)
                     {
-                        List<PlayerAction> tmpList = new List<PlayerAction>();
+                        int uid;
 
-                        recordData.action.Add(tick, tmpList);
+                        int pos;
 
-                        tmpList.Add(new PlayerAction(false, uid, pos));
+                        BattleAi.Start(battle, false, random.Next, out uid, out pos);
 
-                        battle.AddAction(false, uid, pos);
+                        if (uid != -1)
+                        {
+                            List<PlayerAction> tmpList = new List<PlayerAction>();
+
+                            recordData.action.Add(tick, tmpList);
+
+                            tmpList.Add(new PlayerAction(false, uid, pos));
+
+                            battle.AddAction(false, uid, pos);
+                        }
                     }
+                }
+                else
+                {
+                    Reset();
+
+                    battleOverCallBack(result);
                 }
             }
         }

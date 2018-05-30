@@ -5,6 +5,14 @@ using tuple;
 
 namespace Turrent_lib
 {
+    public enum BattleResult
+    {
+        DRAW,
+        M_WIN,
+        O_WIN,
+        NOT_OVER
+    }
+
     public class BattleCore
     {
         public static Func<int, IUnitSDS> GetUnitData;
@@ -54,15 +62,21 @@ namespace Turrent_lib
 
         protected int tick;
 
+        private int maxTime;
+
         private List<Tuple<bool, int, int>> actionList = new List<Tuple<bool, int, int>>();
 
-        internal void Init(int[] _mCards, int[] _oCards)
+        internal void Init(int[] _mCards, int[] _oCards, int _mBase, int _oBase, int _maxTime)
         {
             Reset();
 
             mMoney = oMoney = BattleConst.DEFAULT_MONEY;
 
-            mBase = oBase = BattleConst.DEFAULT_HP;
+            mBase = _mBase;
+
+            oBase = _oBase;
+
+            maxTime = _maxTime;
 
             for (int i = 0; i < BattleConst.DECK_CARD_NUM && i < _mCards.Length; i++)
             {
@@ -187,6 +201,10 @@ namespace Turrent_lib
                 mMoney -= sds.GetCost();
 
                 mHandCards.Remove(_uid);
+
+                mCards.Enqueue(_uid);
+
+                mHandCards.Add(mCards.Dequeue());
             }
             else
             {
@@ -198,6 +216,10 @@ namespace Turrent_lib
                 oMoney -= sds.GetCost();
 
                 oHandCards.Remove(_uid);
+
+                oCards.Enqueue(_uid);
+
+                oHandCards.Add(oCards.Dequeue());
             }
 
             AddUnit(_isMine, sds, _pos);
@@ -257,11 +279,11 @@ namespace Turrent_lib
         {
             tick++;
 
-            yield return UpdateTurrent();
-
             yield return UpdateAction();
 
-            UpdateRecover();
+            yield return UpdateRecoverMoney();
+
+            yield return UpdateTurrent();
         }
 
         private IEnumerator UpdateTurrent()
@@ -292,6 +314,8 @@ namespace Turrent_lib
 
             int lastProcessTime = -1;
 
+            BattleResult result = BattleResult.NOT_OVER;
+
             while (list.Count > 0)
             {
                 list.Sort(SortTurrentList);
@@ -321,6 +345,13 @@ namespace Turrent_lib
                     {
                         yield return RemoveDieUnit(turrent.time, list);
 
+                        result = GetBattleResult(turrent.time);
+
+                        if (result != BattleResult.NOT_OVER)
+                        {
+                            break;
+                        }
+
                         lastProcessTime = -1;
                     }
                     else
@@ -345,7 +376,14 @@ namespace Turrent_lib
                 }
             }
 
-            yield return RemoveDieUnit(time, null);
+            if (result == BattleResult.NOT_OVER)
+            {
+                yield return RemoveDieUnit(time, null);
+
+                result = GetBattleResult(time);
+            }
+
+            yield return new BattleResultVO(result);
         }
 
         private IEnumerator RemoveDieUnit(int _time, List<Turrent> _list)
@@ -356,7 +394,7 @@ namespace Turrent_lib
 
                 if (t != null)
                 {
-                    if (t.parent.hp < 1 || (t.sds.GetLiveTime() > 0 && _time >= t.bornTime + t.sds.GetLiveTime()))
+                    if (t.parent.hp < 1 || (t.dieTime > 0 && _time >= t.dieTime))
                     {
                         if (_list != null)
                         {
@@ -376,7 +414,7 @@ namespace Turrent_lib
 
                 if (t != null)
                 {
-                    if (t.parent.hp < 1 || (t.sds.GetLiveTime() > 0 && _time >= t.bornTime + t.sds.GetLiveTime()))
+                    if (t.parent.hp < 1 || (t.dieTime > 0 && _time >= t.dieTime))
                     {
                         if (_list != null)
                         {
@@ -387,6 +425,33 @@ namespace Turrent_lib
 
                         yield return new BattleDeadVO(true, i);
                     }
+                }
+            }
+        }
+
+        private BattleResult GetBattleResult(int _time)
+        {
+            if (mBase <= 0 && oBase <= 0)
+            {
+                return BattleResult.DRAW;
+            }
+            else if (mBase <= 0)
+            {
+                return BattleResult.O_WIN;
+            }
+            else if (oBase <= 0)
+            {
+                return BattleResult.M_WIN;
+            }
+            else
+            {
+                if (_time >= maxTime)
+                {
+                    return BattleResult.DRAW;
+                }
+                else
+                {
+                    return BattleResult.NOT_OVER;
                 }
             }
         }
@@ -415,7 +480,7 @@ namespace Turrent_lib
             }
         }
 
-        private void UpdateRecover()
+        private IEnumerator UpdateRecoverMoney()
         {
             int time = tick * BattleConst.TICK_TIME;
 
@@ -424,6 +489,8 @@ namespace Turrent_lib
                 mMoney++;
 
                 mMoneyTime += BattleConst.RECOVER_MONEY_TIME;
+
+                yield return new BattleRecoverMoneyVO(true);
             }
 
             while (oMoney < BattleConst.MAX_MONEY && time >= oMoneyTime)
@@ -431,16 +498,8 @@ namespace Turrent_lib
                 oMoney++;
 
                 oMoneyTime += BattleConst.RECOVER_MONEY_TIME;
-            }
 
-            while (mHandCards.Count < BattleConst.HAND_CARDS_NUM && mCards.Count > 0)
-            {
-                mHandCards.Add(mCards.Dequeue());
-            }
-
-            while (oHandCards.Count < BattleConst.HAND_CARDS_NUM && oCards.Count > 0)
-            {
-                oHandCards.Add(oCards.Dequeue());
+                yield return new BattleRecoverMoneyVO(false);
             }
         }
 

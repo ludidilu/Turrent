@@ -19,17 +19,17 @@ internal class BattleUnit
 
         battle = new Battle_server(processBattle);
 
-        battle.ServerSetCallBack(SendData);
+        battle.ServerSetCallBack(SendData, BattleOver);
     }
 
-    internal void Init(int _mPlayer, int _oPlayer, int[] _mCards, int[] _oCards, bool _isVsAi)
+    internal void Init(int _mPlayer, int _oPlayer, int[] _mCards, int[] _oCards, int _mBase, int _oBase, int _maxTime, bool _isVsAi)
     {
         mPlayer = _mPlayer;
         oPlayer = _oPlayer;
 
         isVsAi = _isVsAi;
 
-        battle.ServerStart(_mCards, _oCards, isVsAi);
+        battle.ServerStart(_mCards, _oCards, _mBase, _oBase, _maxTime, isVsAi);
     }
 
     internal void ReceiveData(int _uid, BinaryReader _br)
@@ -71,5 +71,10 @@ internal class BattleUnit
 
     internal void Logout(int _uid)
     {
+    }
+
+    private void BattleOver(BattleResult _result)
+    {
+        BattleManager.Instance.BattleOver(this, mPlayer, oPlayer);
     }
 }
