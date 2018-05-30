@@ -54,6 +54,12 @@ public partial class BattleManager : MonoBehaviour
     [SerializeField]
     private LineRenderer arrowRes;
 
+    [SerializeField]
+    private BattleAlert battleAlert;
+
+    [SerializeField]
+    private RectTransform battleContainer;
+
     [HideInInspector]
     public GameObject eventGo;
 
@@ -139,7 +145,7 @@ public partial class BattleManager : MonoBehaviour
 
                 go.transform.localScale = new Vector3(scale, scale, 1);
 
-                go.transform.SetParent(transform, false);
+                go.transform.SetParent(battleContainer, false);
 
                 mPosArr[id] = go;
 
@@ -156,7 +162,7 @@ public partial class BattleManager : MonoBehaviour
 
         mBase = Instantiate(baseRes);
 
-        mBase.transform.SetParent(transform, false);
+        mBase.transform.SetParent(battleContainer, false);
 
         mBase.gameObject.SetActive(true);
 
@@ -176,7 +182,7 @@ public partial class BattleManager : MonoBehaviour
 
                 go.transform.localScale = new Vector3(scale, scale, 1);
 
-                go.transform.SetParent(transform, false);
+                go.transform.SetParent(battleContainer, false);
 
                 oPosArr[id] = go;
 
@@ -193,7 +199,7 @@ public partial class BattleManager : MonoBehaviour
 
         oBase = Instantiate(baseRes);
 
-        oBase.transform.SetParent(transform, false);
+        oBase.transform.SetParent(battleContainer, false);
 
         oBase.gameObject.SetActive(true);
 
@@ -322,7 +328,7 @@ public partial class BattleManager : MonoBehaviour
 
                     card.gameObject.SetActive(true);
 
-                    card.transform.SetParent(transform, false);
+                    card.transform.SetParent(battleContainer, false);
 
                     SuperFunction.SuperFunctionCallBack0 dele = delegate (int _index)
                     {
@@ -450,7 +456,7 @@ public partial class BattleManager : MonoBehaviour
 
                 unit.gameObject.SetActive(true);
 
-                unit.transform.SetParent(transform, false);
+                unit.transform.SetParent(battleContainer, false);
 
                 mTurrentList.Add(unit);
             }
@@ -508,7 +514,7 @@ public partial class BattleManager : MonoBehaviour
 
                 unit.gameObject.SetActive(true);
 
-                unit.transform.SetParent(transform, false);
+                unit.transform.SetParent(battleContainer, false);
 
                 oTurrentList.Add(unit);
             }
@@ -603,8 +609,40 @@ public partial class BattleManager : MonoBehaviour
 
         if (result != BattleResult.NOT_OVER)
         {
-            Reset();
+            if (result == BattleResult.DRAW)
+            {
+                battleAlert.Show("Draw!", BattleQuit);
+            }
+            else if (result == BattleResult.M_WIN)
+            {
+                if (battle.clientIsMine)
+                {
+                    battleAlert.Show("You win!", BattleQuit);
+                }
+                else
+                {
+                    battleAlert.Show("You lose!", BattleQuit);
+                }
+            }
+            else
+            {
+                if (battle.clientIsMine)
+                {
+                    battleAlert.Show("You lose!", BattleQuit);
+                }
+                else
+                {
+                    battleAlert.Show("You win!", BattleQuit);
+                }
+            }
         }
+    }
+
+    private void BattleQuit()
+    {
+        Reset();
+
+        SuperFunction.Instance.DispatchEvent(eventGo, BATTLE_QUIT);
     }
 
     private void ShowAttack(BattleAttackVO _vo)
