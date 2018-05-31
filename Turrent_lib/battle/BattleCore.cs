@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using tuple;
+using superEvent;
 
 namespace Turrent_lib
 {
@@ -65,6 +66,8 @@ namespace Turrent_lib
         private int maxTime;
 
         private List<Tuple<bool, int, int>> actionList = new List<Tuple<bool, int, int>>();
+
+        internal SuperEventListener eventListener = new SuperEventListener();
 
         internal void Init(int[] _mCards, int[] _oCards, int _mBase, int _oBase, int _maxTime)
         {
@@ -227,24 +230,9 @@ namespace Turrent_lib
 
         private void AddUnit(int _time, bool _isMine, IUnitSDS _sds, int _pos)
         {
-            Turrent[] turrentPos = _isMine ? mTurrent : oTurrent;
-
             Unit unit = new Unit();
 
-            unit.Init(this, _isMine, _sds);
-
-            for (int i = 0; i < _sds.GetPos().Length; i++)
-            {
-                int pos = _sds.GetPos()[i];
-
-                ITurrentSDS sds = _sds.GetTurrent()[i];
-
-                Turrent turrent = new Turrent();
-
-                turrent.Init(this, unit, sds, _pos + pos, _time);
-
-                turrentPos[_pos + pos] = turrent;
-            }
+            unit.Init(this, _isMine, _sds, GetUnitUid(), _pos, _time);
         }
 
         public int GetCard(bool _isMine, int _uid)
@@ -497,15 +485,15 @@ namespace Turrent_lib
             }
         }
 
-        internal int BaseBeDamage(Turrent _turrent)
+        internal int BaseBeDamage(Turrent _turrent, int _damage)
         {
             if (_turrent.parent.isMine)
             {
-                oBase -= _turrent.sds.GetAttackDamage();
+                oBase -= _damage;
             }
             else
             {
-                mBase -= _turrent.sds.GetAttackDamage();
+                mBase -= _damage;
             }
 
             return -_turrent.sds.GetAttackDamage();
@@ -563,6 +551,17 @@ namespace Turrent_lib
             mMoneyTime = 0;
 
             oMoneyTime = 0;
+
+            unitUid = 0;
+        }
+
+        private int unitUid;
+
+        private int GetUnitUid()
+        {
+            unitUid++;
+
+            return unitUid;
         }
 
         public string GetData()

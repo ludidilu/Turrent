@@ -24,6 +24,8 @@ namespace Turrent_lib
 
         private BattleCore battleCore;
 
+        private Dictionary<int, int> lastTargetDic;
+
         internal void Init(BattleCore _battleCore, Unit _parent, ITurrentSDS _sds, int _pos, int _time)
         {
             battleCore = _battleCore;
@@ -41,6 +43,11 @@ namespace Turrent_lib
             if (sds.GetLiveTime() > 0)
             {
                 dieTime = _time + sds.GetLiveTime();
+            }
+
+            if (sds.GetAttackDamageAdd() > 0)
+            {
+                lastTargetDic = new Dictionary<int, int>();
             }
         }
 
@@ -63,6 +70,15 @@ namespace Turrent_lib
 
         private bool Attack(out BattleAttackVO _vo)
         {
+            Dictionary<int, int> recDic = null;
+
+            if (sds.GetAttackDamageAdd() > 0)
+            {
+                recDic = lastTargetDic;
+
+                lastTargetDic = new Dictionary<int, int>();
+            }
+
             List<int> result = BattlePublicTools.GetTurrentAttackTargetList(battleCore, parent.isMine, sds, pos);
 
             if (result != null)
@@ -77,7 +93,24 @@ namespace Turrent_lib
 
                     if (targetPos < 0)
                     {
-                        int damage = battleCore.BaseBeDamage(this);
+                        if (sds.GetAttackDamageAdd() > 0)
+                        {
+                            if (!lastTargetDic.ContainsKey(-1))
+                            {
+                                int lastTargetTime;
+
+                                if (recDic.TryGetValue(-1, out lastTargetTime))
+                                {
+                                    lastTargetDic.Add(-1, lastTargetTime);
+                                }
+                                else
+                                {
+                                    lastTargetDic.Add(-1, time);
+                                }
+                            }
+                        }
+
+                        int damage = DamageBase();
 
                         damageDataList.Add(new KeyValuePair<int, int>(-1, damage));
                     }
@@ -85,7 +118,24 @@ namespace Turrent_lib
                     {
                         Turrent targetTurrent = oppTurrent[targetPos];
 
-                        int damage = targetTurrent.BeDamage(this);
+                        if (sds.GetAttackDamageAdd() > 0)
+                        {
+                            if (!lastTargetDic.ContainsKey(targetTurrent.parent.uid))
+                            {
+                                int lastTargetTime;
+
+                                if (recDic.TryGetValue(targetTurrent.parent.uid, out lastTargetTime))
+                                {
+                                    lastTargetDic.Add(targetTurrent.parent.uid, lastTargetTime);
+                                }
+                                else
+                                {
+                                    lastTargetDic.Add(targetTurrent.parent.uid, time);
+                                }
+                            }
+                        }
+
+                        int damage = DamageTurrent(targetTurrent);
 
                         damageDataList.Add(new KeyValuePair<int, int>(targetPos, damage));
                     }
@@ -103,9 +153,46 @@ namespace Turrent_lib
             }
         }
 
-        private int BeDamage(Turrent _turrent)
+        private int DamageBase()
         {
-            return parent.BeDamaged(_turrent);
+            int damage = sds.GetAttackDamage();
+
+            damage += GetDamageAdd(-1);
+
+            return battleCore.BaseBeDamage(this, damage);
+        }
+
+        private int DamageTurrent(Turrent _turrent)
+        {
+            int damage = sds.GetAttackDamage();
+
+            damage += GetDamageAdd(_turrent.parent.uid);
+
+            return _turrent.BeDamage(this, damage);
+        }
+
+        private int GetDamageAdd(int _uid)
+        {
+            if (sds.GetAttackDamageAdd() > 0)
+            {
+                int damageAdd = (time - lastTargetDic[_uid]) / sds.GetAttackDamageAddGap() * sds.GetAttackDamageAdd();
+
+                if (damageAdd > sds.GetAttackDamageAddMax())
+                {
+                    damageAdd = sds.GetAttackDamageAddMax();
+                }
+
+                return damageAdd;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        private int BeDamage(Turrent _turrent, int _damage)
+        {
+            return parent.BeDamaged(_turrent, _damage);
         }
 
         public string GetData()

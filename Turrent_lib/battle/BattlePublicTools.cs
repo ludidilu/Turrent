@@ -148,5 +148,73 @@ namespace Turrent_lib
 
             return result;
         }
+
+        public static List<int> GetNeighbourUnit(BattleCore _battle, Unit _unit)
+        {
+            Turrent[] turrents = _unit.isMine ? _battle.mTurrent : _battle.oTurrent;
+
+            List<int> result = null;
+
+            for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+            {
+                int turrentPos = _unit.pos + _unit.sds.GetPos()[i];
+
+                int x = turrentPos % BattleConst.MAP_WIDTH;
+
+                int y = turrentPos / BattleConst.MAP_WIDTH;
+
+                if (x > 0)
+                {
+                    int pos = turrentPos - 1;
+
+                    GetNeighbourUnit(turrents, _unit, pos, ref result);
+                }
+
+                if (x < BattleConst.MAP_WIDTH - 1)
+                {
+                    int pos = turrentPos + 1;
+
+                    GetNeighbourUnit(turrents, _unit, pos, ref result);
+                }
+
+                if (y > 0)
+                {
+                    int pos = turrentPos - BattleConst.MAP_WIDTH;
+
+                    GetNeighbourUnit(turrents, _unit, pos, ref result);
+                }
+
+                if (y < BattleConst.MAP_HEIGHT - 1)
+                {
+                    int pos = turrentPos + BattleConst.MAP_WIDTH;
+
+                    GetNeighbourUnit(turrents, _unit, pos, ref result);
+                }
+            }
+
+            return result;
+        }
+
+        private static void GetNeighbourUnit(Turrent[] _turrents, Unit _unit, int _pos, ref List<int> _result)
+        {
+            Turrent turrent = _turrents[_pos];
+
+            if (turrent != null && turrent.parent != _unit)
+            {
+                if (_result == null)
+                {
+                    _result = new List<int>();
+
+                    _result.Add(turrent.parent.uid);
+                }
+                else
+                {
+                    if (!_result.Contains(turrent.parent.uid))
+                    {
+                        _result.Add(turrent.parent.uid);
+                    }
+                }
+            }
+        }
     }
 }

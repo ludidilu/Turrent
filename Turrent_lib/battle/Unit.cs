@@ -10,7 +10,11 @@
 
         private BattleCore battleCore;
 
-        public void Init(BattleCore _battleCore, bool _isMine, IUnitSDS _sds)
+        public int uid { private set; get; }
+
+        public int pos { private set; get; }
+
+        public void Init(BattleCore _battleCore, bool _isMine, IUnitSDS _sds, int _uid, int _pos, int _time)
         {
             battleCore = _battleCore;
 
@@ -18,14 +22,33 @@
 
             sds = _sds;
 
+            uid = _uid;
+
+            pos = _pos;
+
             hp = sds.GetHp();
+
+            Turrent[] turrentPos = isMine ? battleCore.mTurrent : battleCore.oTurrent;
+
+            for (int i = 0; i < sds.GetPos().Length; i++)
+            {
+                int posFix = sds.GetPos()[i];
+
+                ITurrentSDS turrentSDS = sds.GetTurrent()[i];
+
+                Turrent turrent = new Turrent();
+
+                turrent.Init(battleCore, this, turrentSDS, pos + posFix, _time);
+
+                turrentPos[pos + posFix] = turrent;
+            }
         }
 
-        internal int BeDamaged(Turrent _turrent)
+        internal int BeDamaged(Turrent _turrent, int _damage)
         {
-            hp -= _turrent.sds.GetAttackDamage();
+            hp -= _damage;
 
-            return -_turrent.sds.GetAttackDamage();
+            return -_damage;
         }
 
         internal string GetData()

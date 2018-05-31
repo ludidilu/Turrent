@@ -64,6 +64,7 @@
     <Compile Include="ai\node\GetSummonIdConditionNode.cs" />
     <Compile Include="ai\node\GetSummonPosConditionNode.cs" />
     <Compile Include="ai\node\SummonActionNode.cs" />
+    <Compile Include="battle\Aura.cs" />
     <Compile Include="battle\BattleConst.cs" />
     <Compile Include="battle\BattleCore.cs" />
     <Compile Include="battle\BattlePublicTools.cs" />
@@ -79,9 +80,11 @@
     <Compile Include="log\Log.cs" />
     <Compile Include="packageTag\PackageTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="sds\IAuraSDS.cs" />
     <Compile Include="sds\ITurrentSDS.cs" />
     <Compile Include="sds\IUnitSDS.cs" />
     <Compile Include="superEnumerator\SuperEnumerator.cs" />
+    <Compile Include="superEvent\SuperEventListener.cs" />
     <Compile Include="tuple\Tuple.cs" />
   </ItemGroup>
   <ItemGroup />

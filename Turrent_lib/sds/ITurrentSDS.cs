@@ -11,5 +11,9 @@ namespace Turrent_lib
         int GetAttackDamage();
         bool GetCanAttackBase();
         int GetLiveTime();
+
+        int GetAttackDamageAdd();
+        int GetAttackDamageAddMax();
+        int GetAttackDamageAddGap();
     }
 }
