@@ -20,6 +20,8 @@ namespace Turrent_lib
 
         public static Func<int, ITurrentSDS> GetTurrentData;
 
+        public static Func<int, IAuraSDS> GetAuraData;
+
         public static void Init<T, U>(Dictionary<int, T> _unitDic, Dictionary<int, U> _turrentDic) where T : IUnitSDS where U : ITurrentSDS
         {
             GetUnitData = delegate (int _id)

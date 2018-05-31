@@ -19,5 +19,13 @@
         public const int MAX_MONEY = 10;
 
         public const int RECOVER_MONEY_TIME = 4000;
+
+
+
+        public const string DIE = "die";
+
+        public const string BE_CLEAN = "beClean";
+
+        public const string REMOVE_BORN_AURA = "removeBornAura";
     }
 }

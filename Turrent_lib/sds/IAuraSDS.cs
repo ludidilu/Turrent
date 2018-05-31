@@ -23,7 +23,7 @@ namespace Turrent_lib
 
     public interface IAuraSDS
     {
-        int GetEventName();
+        string GetEventName();
         AuraType GetEffectType();
         int GetPriority();
         AuraTrigger GetTrigger();
