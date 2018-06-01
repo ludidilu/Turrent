@@ -59,7 +59,7 @@ namespace Turrent_lib
             }
         }
 
-        private static int RegisterAura(BattleCore _battle, Unit _hero, IAuraSDS _sds, AuraRegisterType _registerType)
+        private static int RegisterAura(BattleCore _battle, Unit _unit, IAuraSDS _sds, AuraRegisterType _registerType)
         {
             int result;
 
@@ -67,21 +67,21 @@ namespace Turrent_lib
             {
                 case AuraType.FIX_INT:
 
-                    SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerHero, Unit _triggerTargetHero)
+                    SuperEventListener.SuperFunctionCallBackV1<int, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerUnit)
                     {
-                        if (CheckAuraIsBeSilenced(_battle, _hero, _registerType) && CheckAuraTrigger(_battle, _hero, _triggerHero, _sds) && CheckCondition(_battle, _hero, _triggerHero, _triggerTargetHero, _sds.GetConditionCompare(), _sds.GetConditionType(), _sds.GetConditionData()))
+                        if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerUnit, _sds))
                         {
-                            Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
+                            //Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
 
-                            if (heroData == Hero.HeroData.DATA)
-                            {
-                                _result += _sds.GetEffectData()[1];
+                            //if (heroData == Hero.HeroData.DATA)
+                            //{
+                            //    _result += _sds.GetEffectData()[1];
 
-                            }
-                            else
-                            {
-                                _result += _hero.GetData(heroData) * _sds.GetEffectData()[1];
-                            }
+                            //}
+                            //else
+                            //{
+                            //    _result += _unit.GetData(heroData) * _sds.GetEffectData()[1];
+                            //}
                         }
                     };
 
@@ -91,21 +91,21 @@ namespace Turrent_lib
 
                 case AuraType.SET_INT:
 
-                    SuperEventListener.SuperFunctionCallBackV2<int, Hero, Hero> dele3 = delegate (int _index, ref int _result, Hero _triggerHero, Hero _triggerTargetHero)
+                    SuperEventListener.SuperFunctionCallBackV1<int, Unit> dele3 = delegate (int _index, ref int _result, Unit _triggerHero)
                     {
-                        if (CheckAuraIsBeSilenced(_battle, _hero, _registerType) && CheckAuraTrigger(_battle, _hero, _triggerHero, _sds) && CheckCondition(_battle, _hero, _triggerHero, _triggerTargetHero, _sds.GetConditionCompare(), _sds.GetConditionType(), _sds.GetConditionData()))
+                        if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerHero, _sds))
                         {
-                            Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
+                            //Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
 
-                            if (heroData == Hero.HeroData.DATA)
-                            {
-                                _result = _sds.GetEffectData()[1];
+                            //if (heroData == Hero.HeroData.DATA)
+                            //{
+                            //    _result = _sds.GetEffectData()[1];
 
-                            }
-                            else
-                            {
-                                _result = _hero.GetData(heroData) * _sds.GetEffectData()[1];
-                            }
+                            //}
+                            //else
+                            //{
+                            //    _result = _unit.GetData(heroData) * _sds.GetEffectData()[1];
+                            //}
                         }
                     };
 
@@ -115,59 +115,59 @@ namespace Turrent_lib
 
                 case AuraType.CAST_SKILL:
 
-                    SuperEventListener.SuperFunctionCallBackV2<LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>, Hero, Hero> dele2 = delegate (int _index, ref LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>> _funcList, Hero _triggerHero, Hero _triggerTargetHero)
-                    {
-                        if (CheckAuraIsBeSilenced(_battle, _hero, _registerType) && CheckAuraTrigger(_battle, _hero, _triggerHero, _sds) && CheckCondition(_battle, _hero, _triggerHero, _triggerTargetHero, _sds.GetConditionCompare(), _sds.GetConditionType(), _sds.GetConditionData()))
-                        {
-                            IEffectSDS effectSDS = Battle.GetEffectData(_sds.GetEffectData()[0]);
+                    //SuperEventListener.SuperFunctionCallBackV2<LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>, Hero, Hero> dele2 = delegate (int _index, ref LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>> _funcList, Hero _triggerHero, Hero _triggerTargetHero)
+                    //{
+                    //    if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerHero, _sds) && CheckCondition(_battle, _unit, _triggerHero, _triggerTargetHero, _sds.GetConditionCompare(), _sds.GetConditionType(), _sds.GetConditionData()))
+                    //    {
+                    //        IEffectSDS effectSDS = Battle.GetEffectData(_sds.GetEffectData()[0]);
 
-                            Func<BattleTriggerAuraVO> func = delegate ()
-                            {
-                                return AuraCastSkill(_battle, _hero, _triggerHero, _triggerTargetHero, _sds, effectSDS);
-                            };
+                    //        Func<BattleTriggerAuraVO> func = delegate ()
+                    //        {
+                    //            return AuraCastSkill(_battle, _unit, _triggerHero, _triggerTargetHero, _sds, effectSDS);
+                    //        };
 
-                            if (_funcList == null)
-                            {
-                                _funcList = new LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>();
-                            }
+                    //        if (_funcList == null)
+                    //        {
+                    //            _funcList = new LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>();
+                    //        }
 
-                            int priority = effectSDS.GetPriority();
+                    //        int priority = effectSDS.GetPriority();
 
-                            LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> addNode = new LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>>(new KeyValuePair<int, Func<BattleTriggerAuraVO>>(priority, func));
+                    //        LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> addNode = new LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>>(new KeyValuePair<int, Func<BattleTriggerAuraVO>>(priority, func));
 
-                            LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> node = _funcList.First;
+                    //        LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> node = _funcList.First;
 
-                            if (node == null)
-                            {
-                                _funcList.AddFirst(addNode);
-                            }
-                            else
-                            {
-                                while (true)
-                                {
-                                    if (priority > node.Value.Key)
-                                    {
-                                        node = node.Next;
+                    //        if (node == null)
+                    //        {
+                    //            _funcList.AddFirst(addNode);
+                    //        }
+                    //        else
+                    //        {
+                    //            while (true)
+                    //            {
+                    //                if (priority > node.Value.Key)
+                    //                {
+                    //                    node = node.Next;
 
-                                        if (node == null)
-                                        {
-                                            _funcList.AddLast(addNode);
+                    //                    if (node == null)
+                    //                    {
+                    //                        _funcList.AddLast(addNode);
 
-                                            break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _funcList.AddBefore(node, addNode);
+                    //                        break;
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    _funcList.AddBefore(node, addNode);
 
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    };
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //};
 
-                    result = _battle.eventListener.AddListener(_sds.GetEventName(), dele2);
+                    //result = _battle.eventListener.AddListener(_sds.GetEventName(), dele2);
 
                     break;
 
@@ -177,6 +177,251 @@ namespace Turrent_lib
             }
 
             return result;
+        }
+
+        private static bool CheckAuraIsBeSilenced(BattleCore _battle, Unit _unit, AuraRegisterType _registerType)
+        {
+            if (_registerType == AuraRegisterType.AURA)
+            {
+                int canTrigger = 1;
+
+                _battle.eventListener.DispatchEvent<int, Unit>(BattleConst.TRIGGER_BORN_AURA, ref canTrigger, _unit);
+
+                if (canTrigger < 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool CheckAuraTrigger(BattleCore _battle, Unit _unit, Unit _triggerUnit, IAuraSDS _sds)
+        {
+            switch (_sds.GetTrigger())
+            {
+                case AuraTrigger.OWNER:
+
+                    return _triggerUnit == _unit;
+
+                case AuraTrigger.OWNER_NEIGHBOUR_ALLY:
+
+                    List<int> list = BattlePublicTools.GetNeighbourUnit(_battle, _unit);
+
+                    return list.Contains(_triggerUnit.uid);
+
+                case AuraTrigger.OWNER_ALLY:
+
+                    return _triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine;
+
+                case AuraTrigger.OWNER_ROW_ALLY:
+
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+
+                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
+
+                            if (!dic.ContainsKey(nowY))
+                            {
+                                dic.Add(nowY, false);
+                            }
+                        }
+
+                        y = _triggerUnit.pos / BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _triggerUnit.sds.GetPos()[i];
+
+                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
+
+                            if (dic.ContainsKey(nowY))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.OWNER_COL_ALLY:
+
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+
+                        int x = _unit.pos % BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+
+                            if (!dic.ContainsKey(nowX))
+                            {
+                                dic.Add(nowX, false);
+                            }
+                        }
+
+                        x = _triggerUnit.pos % BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _triggerUnit.sds.GetPos()[i];
+
+                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+
+                            if (dic.ContainsKey(nowX))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.OWNER_FRONT_ALLY:
+
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+
+                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
+
+                            if (nowY >= BattleConst.MAP_WIDTH)
+                            {
+                                int pos = _unit.pos + posFix - BattleConst.MAP_WIDTH;
+
+                                if (!dic.ContainsKey(pos))
+                                {
+                                    dic.Add(pos, false);
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _triggerUnit.sds.GetPos()[i];
+
+                            int pos = _triggerUnit.pos + posFix;
+
+                            if (dic.ContainsKey(pos))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.OWNER_BACK_ALLY:
+
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+
+                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
+
+                            if (nowY < BattleConst.MAP_HEIGHT - 1)
+                            {
+                                int pos = _unit.pos + posFix + BattleConst.MAP_WIDTH;
+
+                                if (!dic.ContainsKey(pos))
+                                {
+                                    dic.Add(pos, false);
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _triggerUnit.sds.GetPos()[i];
+
+                            int pos = _triggerUnit.pos + posFix;
+
+                            if (dic.ContainsKey(pos))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.OWNER_BESIDE_ALLY:
+
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+
+                        int x = _unit.pos % BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+
+                            if (nowX > 0)
+                            {
+                                int pos = _unit.pos + posFix - 1;
+
+                                if (!dic.ContainsKey(pos))
+                                {
+                                    dic.Add(pos, false);
+                                }
+                            }
+
+                            if (nowX < BattleConst.MAP_WIDTH - 1)
+                            {
+                                int pos = _unit.pos + posFix + 1;
+
+                                if (!dic.ContainsKey(pos))
+                                {
+                                    dic.Add(pos, false);
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _triggerUnit.sds.GetPos()[i];
+
+                            int pos = _triggerUnit.pos + posFix;
+
+                            if (dic.ContainsKey(pos))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                default:
+
+                    throw new Exception("CheckAuraTrigger error:" + _sds.GetTrigger());
+            }
         }
     }
 }

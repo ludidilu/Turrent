@@ -27,5 +27,7 @@
         public const string BE_CLEAN = "beClean";
 
         public const string REMOVE_BORN_AURA = "removeBornAura";
+
+        public const string TRIGGER_BORN_AURA = "triggerBornAura";
     }
 }
