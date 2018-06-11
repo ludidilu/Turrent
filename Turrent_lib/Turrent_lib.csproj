@@ -81,6 +81,7 @@
     <Compile Include="packageTag\PackageTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="sds\IAuraSDS.cs" />
+    <Compile Include="sds\IEffectSDS.cs" />
     <Compile Include="sds\ITurrentSDS.cs" />
     <Compile Include="sds\IUnitSDS.cs" />
     <Compile Include="superEnumerator\SuperEnumerator.cs" />

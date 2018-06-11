@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Turrent_lib
+﻿namespace Turrent_lib
 {
     public enum AuraType
     {
@@ -21,6 +19,13 @@ namespace Turrent_lib
         OWNER_BACK_ALLY,
         OWNER_BESIDE_ALLY,
         ENEMY,
+    }
+
+    public enum AuraTarget
+    {
+        OWNER,
+        TRIGGER,
+        OTHER,
     }
 
     public interface IAuraSDS
