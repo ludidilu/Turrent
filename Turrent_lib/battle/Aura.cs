@@ -23,7 +23,7 @@ namespace Turrent_lib
 
             ids.Add(id);
 
-            SuperEventListener.SuperFunctionCallBackV1<List<Action>, Unit> dele = delegate (int _index, ref List<Action> _funcList, Unit _triggerUnit)
+            SuperEventListener.SuperFunctionCallBackV2<List<Action>, Unit, Unit> dele = delegate (int _index, ref List<Action> _funcList, Unit _triggerUnit, Unit _otherUnit)
             {
                 if (_triggerUnit == _unit)
                 {
@@ -65,23 +65,13 @@ namespace Turrent_lib
 
             switch (_sds.GetEffectType())
             {
-                case AuraType.FIX_INT:
+                case AuraType.ADD_INT:
 
-                    SuperEventListener.SuperFunctionCallBackV1<int, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerUnit)
+                    SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerUnit, Unit _otherUnit)
                     {
                         if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerUnit, _sds))
                         {
-                            //Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
-
-                            //if (heroData == Hero.HeroData.DATA)
-                            //{
-                            //    _result += _sds.GetEffectData()[1];
-
-                            //}
-                            //else
-                            //{
-                            //    _result += _unit.GetData(heroData) * _sds.GetEffectData()[1];
-                            //}
+                            _result += _sds.GetEffectData()[0];
                         }
                     };
 
@@ -91,21 +81,11 @@ namespace Turrent_lib
 
                 case AuraType.SET_INT:
 
-                    SuperEventListener.SuperFunctionCallBackV1<int, Unit> dele3 = delegate (int _index, ref int _result, Unit _triggerHero)
+                    SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele3 = delegate (int _index, ref int _result, Unit _triggerHero, Unit _otherUnit)
                     {
                         if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerHero, _sds))
                         {
-                            //Hero.HeroData heroData = (Hero.HeroData)(_sds.GetEffectData()[0]);
-
-                            //if (heroData == Hero.HeroData.DATA)
-                            //{
-                            //    _result = _sds.GetEffectData()[1];
-
-                            //}
-                            //else
-                            //{
-                            //    _result = _unit.GetData(heroData) * _sds.GetEffectData()[1];
-                            //}
+                            _result = _sds.GetEffectData()[0];
                         }
                     };
 
@@ -113,61 +93,31 @@ namespace Turrent_lib
 
                     break;
 
+                case AuraType.MULTI_INT:
+
+                    SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele4 = delegate (int _index, ref int _result, Unit _triggerHero, Unit _otherUnit)
+                    {
+                        if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerHero, _sds))
+                        {
+                            _result = (int)(0.001f * _sds.GetEffectData()[0] * _result);
+                        }
+                    };
+
+                    result = _battle.eventListener.AddListener(_sds.GetEventName(), dele4, _sds.GetPriority());
+
+                    break;
+
                 case AuraType.CAST_SKILL:
 
-                    //SuperEventListener.SuperFunctionCallBackV2<LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>, Hero, Hero> dele2 = delegate (int _index, ref LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>> _funcList, Hero _triggerHero, Hero _triggerTargetHero)
-                    //{
-                    //    if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerHero, _sds) && CheckCondition(_battle, _unit, _triggerHero, _triggerTargetHero, _sds.GetConditionCompare(), _sds.GetConditionType(), _sds.GetConditionData()))
-                    //    {
-                    //        IEffectSDS effectSDS = Battle.GetEffectData(_sds.GetEffectData()[0]);
+                    SuperEventListener.SuperFunctionCallBackV2<List<Action>, Unit, Unit> dele2 = delegate (int _index, ref List<Action> _funcList, Unit _triggerUnit, Unit _otherUnit)
+                    {
+                        if (CheckAuraIsBeSilenced(_battle, _unit, _registerType) && CheckAuraTrigger(_battle, _unit, _triggerUnit, _sds))
+                        {
 
-                    //        Func<BattleTriggerAuraVO> func = delegate ()
-                    //        {
-                    //            return AuraCastSkill(_battle, _unit, _triggerHero, _triggerTargetHero, _sds, effectSDS);
-                    //        };
+                        }
+                    };
 
-                    //        if (_funcList == null)
-                    //        {
-                    //            _funcList = new LinkedList<KeyValuePair<int, Func<BattleTriggerAuraVO>>>();
-                    //        }
-
-                    //        int priority = effectSDS.GetPriority();
-
-                    //        LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> addNode = new LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>>(new KeyValuePair<int, Func<BattleTriggerAuraVO>>(priority, func));
-
-                    //        LinkedListNode<KeyValuePair<int, Func<BattleTriggerAuraVO>>> node = _funcList.First;
-
-                    //        if (node == null)
-                    //        {
-                    //            _funcList.AddFirst(addNode);
-                    //        }
-                    //        else
-                    //        {
-                    //            while (true)
-                    //            {
-                    //                if (priority > node.Value.Key)
-                    //                {
-                    //                    node = node.Next;
-
-                    //                    if (node == null)
-                    //                    {
-                    //                        _funcList.AddLast(addNode);
-
-                    //                        break;
-                    //                    }
-                    //                }
-                    //                else
-                    //                {
-                    //                    _funcList.AddBefore(node, addNode);
-
-                    //                    break;
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //};
-
-                    //result = _battle.eventListener.AddListener(_sds.GetEventName(), dele2);
+                    result = _battle.eventListener.AddListener(_sds.GetEventName(), dele2);
 
                     break;
 
@@ -203,6 +153,10 @@ namespace Turrent_lib
                 case AuraTrigger.OWNER:
 
                     return _triggerUnit == _unit;
+
+                case AuraTrigger.ENEMY:
+
+                    return _triggerUnit.isMine != _unit.isMine;
 
                 case AuraTrigger.OWNER_NEIGHBOUR_ALLY:
 

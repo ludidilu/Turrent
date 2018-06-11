@@ -4,9 +4,10 @@ namespace Turrent_lib
 {
     public enum AuraType
     {
-        FIX_INT,
+        ADD_INT,
         CAST_SKILL,
         SET_INT,
+        MULTI_INT,
     }
 
     public enum AuraTrigger
@@ -19,6 +20,7 @@ namespace Turrent_lib
         OWNER_FRONT_ALLY,
         OWNER_BACK_ALLY,
         OWNER_BESIDE_ALLY,
+        ENEMY,
     }
 
     public interface IAuraSDS
