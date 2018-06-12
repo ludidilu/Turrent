@@ -17,13 +17,13 @@ namespace Turrent_lib
             aiSummonData = new AiSummonData();
         }
 
-        public static void Start(BattleCore _battle, bool _isMine, Func<int, int> _getRandomValueCallBack, out int _uid, out int _pos)
+        public static void Start(BattleCore _battleCore, bool _isMine, Func<int, int> _getRandomValueCallBack, out int _uid, out int _pos)
         {
             aiSummonData.uid = -1;
 
             aiSummonData.pos = -1;
 
-            btRoot.Enter(_getRandomValueCallBack, _battle, _isMine, aiSummonData);
+            btRoot.Enter(_getRandomValueCallBack, _battleCore, _isMine, aiSummonData);
 
             if (aiSummonData.uid == -1 || aiSummonData.pos == -1)
             {

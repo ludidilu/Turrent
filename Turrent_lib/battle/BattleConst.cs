@@ -26,8 +26,28 @@
 
         public const string BE_CLEAN = "beClean";
 
-        public const string REMOVE_BORN_AURA = "removeBornAura";
+        public const string TIME_OVER = "timeOver";
 
         public const string TRIGGER_BORN_AURA = "triggerBornAura";
+
+        public const string FIX_DO_PHYSIC_DAMAGE = "fixDoPhysicDamage";
+
+        public const string FIX_DO_MAGIC_DAMAGE = "fixDoMagicDamage";
+
+        public const string FIX_BE_PHYSIC_DAMAGE = "fixBePhysicDamage";
+
+        public const string FIX_BE_MAGIC_DAMAGE = "fixBeMagicDamage";
+
+        public const string DO_PHYSIC_DAMAGE = "doPhysicDamage";
+
+        public const string DO_MAGIC_DAMAGE = "doMagicDamage";
+
+        public const string DO_PHYSIC_DAMAGE_BASE = "doPhysicDamageBase";
+
+        public const string DO_MAGIC_DAMAGE_BASE = "doMagicDamageBase";
+
+        public const string BE_PHYSIC_DAMAGE = "bePhysicDamage";
+
+        public const string BE_MAGIC_DAMAGE = "beMagicDamage";
     }
 }

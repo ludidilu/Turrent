@@ -39,6 +39,8 @@ namespace Turrent_lib
 
         internal Turrent[] oTurrent = new Turrent[BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT];
 
+        private List<Unit> unitList = new List<Unit>();
+
         public int mBase { private set; get; }
 
         public int oBase { private set; get; }
@@ -205,7 +207,7 @@ namespace Turrent_lib
 
                 mHandCards.Remove(_uid);
 
-                mCards.Enqueue(_uid);
+                mCards.Enqueue(_uid + mCardsArr.Length);
 
                 mHandCards.Add(mCards.Dequeue());
             }
@@ -220,7 +222,7 @@ namespace Turrent_lib
 
                 oHandCards.Remove(_uid);
 
-                oCards.Enqueue(_uid);
+                oCards.Enqueue(_uid + oCardsArr.Length);
 
                 oHandCards.Add(oCards.Dequeue());
             }
@@ -235,17 +237,19 @@ namespace Turrent_lib
             Unit unit = new Unit();
 
             unit.Init(this, _isMine, _sds, GetUnitUid(), _pos, _time);
+
+            unitList.Add(unit);
         }
 
         public int GetCard(bool _isMine, int _uid)
         {
             if (_isMine)
             {
-                return mCardsArr[_uid];
+                return mCardsArr[_uid % mCardsArr.Length];
             }
             else
             {
-                return oCardsArr[_uid];
+                return oCardsArr[_uid % oCardsArr.Length];
             }
         }
 
@@ -314,46 +318,28 @@ namespace Turrent_lib
                     {
                         lastProcessTime = turrent.time;
 
-                        BattleAttackVO vo;
-
-                        bool b = turrent.Update(out vo);
-
-                        if (b)
-                        {
-                            yield return vo;
-                        }
-                        else
-                        {
-                            list.RemoveAt(0);
-                        }
+                        eventListener.DispatchEvent(BattleConst.TIME_OVER, lastProcessTime);
                     }
                     else if (turrent.time > lastProcessTime)
                     {
-                        yield return RemoveDieUnit(turrent.time, list);
+                        lastProcessTime = turrent.time;
 
-                        result = GetBattleResult(turrent.time);
+                        eventListener.DispatchEvent(BattleConst.TIME_OVER, lastProcessTime);
 
-                        if (result != BattleResult.NOT_OVER)
-                        {
-                            break;
-                        }
+                        yield return RemoveDieUnit(lastProcessTime, list);
+                    }
 
-                        lastProcessTime = -1;
+                    BattleAttackVO vo;
+
+                    bool b = turrent.Update(out vo);
+
+                    if (b)
+                    {
+                        yield return vo;
                     }
                     else
                     {
-                        BattleAttackVO vo;
-
-                        bool b = turrent.Update(out vo);
-
-                        if (b)
-                        {
-                            yield return vo;
-                        }
-                        else
-                        {
-                            list.RemoveAt(0);
-                        }
+                        list.RemoveAt(0);
                     }
                 }
                 else
@@ -364,6 +350,8 @@ namespace Turrent_lib
 
             if (result == BattleResult.NOT_OVER)
             {
+                eventListener.DispatchEvent(BattleConst.TIME_OVER, _time);
+
                 yield return RemoveDieUnit(_time, null);
 
                 result = GetBattleResult(_time);
@@ -374,43 +362,31 @@ namespace Turrent_lib
 
         private IEnumerator RemoveDieUnit(int _time, List<Turrent> _list)
         {
-            for (int i = 0; i < mTurrent.Length; i++)
+            for (int i = unitList.Count - 1; i > -1; i--)
             {
-                Turrent t = mTurrent[i];
+                Unit unit = unitList[i];
 
-                if (t != null)
+                if (unit.hp < 1 || (unit.dieTime > 0 && _time >= unit.dieTime))
                 {
-                    if (t.parent.hp < 1 || (t.dieTime > 0 && _time >= t.dieTime))
+                    unit.Die(_time);
+
+                    Turrent[] turrentArr = unit.isMine ? mTurrent : oTurrent;
+
+                    for (int m = 0; m < unit.turrentList.Count; m++)
                     {
+                        Turrent turrent = unit.turrentList[m];
+
+                        turrentArr[turrent.pos] = null;
+
                         if (_list != null)
                         {
-                            _list.Remove(t);
+                            _list.Remove(turrent);
                         }
-
-                        mTurrent[i] = null;
-
-                        yield return new BattleDeadVO(true, i);
                     }
-                }
-            }
 
-            for (int i = 0; i < oTurrent.Length; i++)
-            {
-                Turrent t = oTurrent[i];
+                    unitList.RemoveAt(i);
 
-                if (t != null)
-                {
-                    if (t.parent.hp < 1 || (t.dieTime > 0 && _time >= t.dieTime))
-                    {
-                        if (_list != null)
-                        {
-                            _list.Remove(t);
-                        }
-
-                        oTurrent[i] = null;
-
-                        yield return new BattleDeadVO(true, i);
-                    }
+                    yield return new BattleDeadVO(true, unit.uid);
                 }
             }
         }
@@ -487,9 +463,9 @@ namespace Turrent_lib
             }
         }
 
-        internal int BaseBeDamage(Turrent _turrent, int _damage)
+        internal int BaseBeDamage(Unit _unit, int _damage)
         {
-            if (_turrent.parent.isMine)
+            if (_unit.isMine)
             {
                 oBase -= _damage;
             }
@@ -498,7 +474,7 @@ namespace Turrent_lib
                 mBase -= _damage;
             }
 
-            return -_turrent.sds.GetAttackDamage();
+            return -_damage;
         }
 
         private static int SortTurrentList(Turrent _t0, Turrent _t1)
@@ -547,6 +523,8 @@ namespace Turrent_lib
 
                 oTurrent[i] = null;
             }
+
+            unitList.Clear();
 
             tick = 0;
 

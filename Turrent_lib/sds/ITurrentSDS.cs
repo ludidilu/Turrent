@@ -2,6 +2,12 @@
 
 namespace Turrent_lib
 {
+    public enum DamageType
+    {
+        PHYSIC,
+        MAGIC,
+    }
+
     public interface ITurrentSDS
     {
         int GetCd();
@@ -9,8 +15,8 @@ namespace Turrent_lib
         KeyValuePair<int, int>[][] GetAttackSplashPos();
         int GetAttackGap();
         int GetAttackDamage();
+        DamageType GetAttackDamageType();
         bool GetCanAttackBase();
-        int GetLiveTime();
 
         int GetAttackDamageAdd();
         int GetAttackDamageAddMax();

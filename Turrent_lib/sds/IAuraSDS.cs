@@ -28,6 +28,13 @@
         OTHER,
     }
 
+    public enum EffectType
+    {
+        PHYSIC_DAMAGE,
+        MAGIC_DAMAGE,
+        ADD_AURA,
+    }
+
     public interface IAuraSDS
     {
         string GetEventName();
@@ -35,6 +42,7 @@
         int GetPriority();
         AuraTrigger GetTrigger();
         int GetTime();
+        AuraTarget GetEffectTarget();
         int[] GetEffectData();
         string[] GetRemoveEventNames();
     }

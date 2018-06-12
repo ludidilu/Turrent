@@ -4,13 +4,13 @@
     {
         public bool isMine;
 
-        public int pos;
+        public int uid;
 
-        public BattleDeadVO(bool _isMine, int _pos)
+        public BattleDeadVO(bool _isMine, int _uid)
         {
             isMine = _isMine;
 
-            pos = _pos;
+            uid = _uid;
         }
     }
 }

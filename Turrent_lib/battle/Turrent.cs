@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Turrent_lib
 {
@@ -20,11 +21,9 @@ namespace Turrent_lib
 
         internal int time { private set; get; }
 
-        internal int dieTime { private set; get; }
-
         private BattleCore battleCore;
 
-        private Dictionary<int, int> lastTargetDic;
+        private Dictionary<KeyValuePair<int, int>, int> lastTargetDic;
 
         internal void Init(BattleCore _battleCore, Unit _parent, ITurrentSDS _sds, int _pos, int _time)
         {
@@ -40,14 +39,9 @@ namespace Turrent_lib
 
             time = _time + sds.GetCd();
 
-            if (sds.GetLiveTime() > 0)
-            {
-                dieTime = _time + sds.GetLiveTime();
-            }
-
             if (sds.GetAttackDamageAdd() > 0)
             {
-                lastTargetDic = new Dictionary<int, int>();
+                lastTargetDic = new Dictionary<KeyValuePair<int, int>, int>();
             }
         }
 
@@ -70,13 +64,13 @@ namespace Turrent_lib
 
         private bool Attack(out BattleAttackVO _vo)
         {
-            Dictionary<int, int> recDic = null;
+            Dictionary<KeyValuePair<int, int>, int> recDic = null;
 
             if (sds.GetAttackDamageAdd() > 0)
             {
                 recDic = lastTargetDic;
 
-                lastTargetDic = new Dictionary<int, int>();
+                lastTargetDic = new Dictionary<KeyValuePair<int, int>, int>();
             }
 
             List<int> result = BattlePublicTools.GetTurrentAttackTargetList(battleCore, parent.isMine, sds, pos);
@@ -95,17 +89,17 @@ namespace Turrent_lib
                     {
                         if (sds.GetAttackDamageAdd() > 0)
                         {
-                            if (!lastTargetDic.ContainsKey(-1))
+                            if (!lastTargetDic.ContainsKey(new KeyValuePair<int, int>(-1, -1)))
                             {
                                 int lastTargetTime;
 
-                                if (recDic.TryGetValue(-1, out lastTargetTime))
+                                if (recDic.TryGetValue(new KeyValuePair<int, int>(-1, -1), out lastTargetTime))
                                 {
-                                    lastTargetDic.Add(-1, lastTargetTime);
+                                    lastTargetDic.Add(new KeyValuePair<int, int>(-1, -1), lastTargetTime);
                                 }
                                 else
                                 {
-                                    lastTargetDic.Add(-1, time);
+                                    lastTargetDic.Add(new KeyValuePair<int, int>(-1, -1), time);
                                 }
                             }
                         }
@@ -120,17 +114,17 @@ namespace Turrent_lib
 
                         if (sds.GetAttackDamageAdd() > 0)
                         {
-                            if (!lastTargetDic.ContainsKey(targetTurrent.parent.uid))
+                            if (!lastTargetDic.ContainsKey(new KeyValuePair<int, int>(targetTurrent.parent.uid, targetTurrent.pos)))
                             {
                                 int lastTargetTime;
 
-                                if (recDic.TryGetValue(targetTurrent.parent.uid, out lastTargetTime))
+                                if (recDic.TryGetValue(new KeyValuePair<int, int>(targetTurrent.parent.uid, targetTurrent.pos), out lastTargetTime))
                                 {
-                                    lastTargetDic.Add(targetTurrent.parent.uid, lastTargetTime);
+                                    lastTargetDic.Add(new KeyValuePair<int, int>(targetTurrent.parent.uid, targetTurrent.pos), lastTargetTime);
                                 }
                                 else
                                 {
-                                    lastTargetDic.Add(targetTurrent.parent.uid, time);
+                                    lastTargetDic.Add(new KeyValuePair<int, int>(targetTurrent.parent.uid, targetTurrent.pos), time);
                                 }
                             }
                         }
@@ -157,25 +151,65 @@ namespace Turrent_lib
         {
             int damage = sds.GetAttackDamage();
 
-            damage += GetDamageAdd(-1);
+            damage += GetDamageAdd(-1, -1);
 
-            return battleCore.BaseBeDamage(this, damage);
+            if (sds.GetAttackDamageType() == DamageType.PHYSIC)
+            {
+                battleCore.eventListener.DispatchEvent<int, Unit, Unit>(BattleConst.FIX_DO_PHYSIC_DAMAGE, ref damage, parent, null);
+
+                battleCore.eventListener.DispatchEvent<Unit, Unit>(BattleConst.DO_PHYSIC_DAMAGE_BASE, parent, null);
+            }
+            else if (sds.GetAttackDamageType() == DamageType.MAGIC)
+            {
+                battleCore.eventListener.DispatchEvent<int, Unit, Unit>(BattleConst.FIX_DO_MAGIC_DAMAGE, ref damage, parent, null);
+
+                battleCore.eventListener.DispatchEvent<Unit, Unit>(BattleConst.DO_MAGIC_DAMAGE_BASE, parent, null);
+            }
+
+            if (damage < 1)
+            {
+                damage = 1;
+            }
+
+            return battleCore.BaseBeDamage(parent, damage);
         }
 
         private int DamageTurrent(Turrent _turrent)
         {
             int damage = sds.GetAttackDamage();
 
-            damage += GetDamageAdd(_turrent.parent.uid);
+            damage += GetDamageAdd(_turrent.parent.uid, _turrent.pos);
 
-            return _turrent.BeDamage(this, damage);
+            switch (sds.GetAttackDamageType())
+            {
+                case DamageType.PHYSIC:
+
+                    battleCore.eventListener.DispatchEvent(BattleConst.FIX_DO_PHYSIC_DAMAGE, ref damage, parent, _turrent.parent);
+
+                    battleCore.eventListener.DispatchEvent(BattleConst.DO_PHYSIC_DAMAGE, parent, _turrent.parent);
+
+                    return _turrent.parent.BePhysicDamaged(parent, damage, time);
+
+                case DamageType.MAGIC:
+
+                    battleCore.eventListener.DispatchEvent(BattleConst.FIX_DO_MAGIC_DAMAGE, ref damage, parent, _turrent.parent);
+
+                    battleCore.eventListener.DispatchEvent(BattleConst.DO_MAGIC_DAMAGE, parent, _turrent.parent);
+
+                    return _turrent.parent.BeMagicDamaged(parent, damage, time);
+
+                default:
+
+                    throw new Exception("unknown attackDamageType:" + sds.GetAttackDamageType());
+            }
+
         }
 
-        private int GetDamageAdd(int _uid)
+        private int GetDamageAdd(int _uid, int _pos)
         {
             if (sds.GetAttackDamageAdd() > 0)
             {
-                int damageAdd = (time - lastTargetDic[_uid]) / sds.GetAttackDamageAddGap() * sds.GetAttackDamageAdd();
+                int damageAdd = (time - lastTargetDic[new KeyValuePair<int, int>(_uid, _pos)]) / sds.GetAttackDamageAddGap() * sds.GetAttackDamageAdd();
 
                 if (damageAdd > sds.GetAttackDamageAddMax())
                 {
@@ -190,11 +224,6 @@ namespace Turrent_lib
             }
         }
 
-        private int BeDamage(Turrent _turrent, int _damage)
-        {
-            return parent.BeDamaged(_turrent, _damage);
-        }
-
         public string GetData()
         {
             string str = string.Empty;
@@ -204,8 +233,6 @@ namespace Turrent_lib
             str += "pos:" + pos + ";";
 
             str += "time:" + time + ";";
-
-            str += "dieTime:" + dieTime + ";";
 
             return str;
         }

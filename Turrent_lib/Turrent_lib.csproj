@@ -73,6 +73,7 @@
     <Compile Include="battle\battleVO\BattleRecoverMoneyVO.cs" />
     <Compile Include="battle\battleVO\BattleResultVO.cs" />
     <Compile Include="battle\battleVO\BattleSummonVO.cs" />
+    <Compile Include="battle\Effect.cs" />
     <Compile Include="battle\Turrent.cs" />
     <Compile Include="battle\Unit.cs" />
     <Compile Include="battle_client\Battle_client.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="packageTag\PackageTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="sds\IAuraSDS.cs" />
-    <Compile Include="sds\IEffectSDS.cs" />
     <Compile Include="sds\ITurrentSDS.cs" />
     <Compile Include="sds\IUnitSDS.cs" />
     <Compile Include="superEnumerator\SuperEnumerator.cs" />

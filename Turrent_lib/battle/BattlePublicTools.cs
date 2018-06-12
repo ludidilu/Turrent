@@ -27,7 +27,7 @@ namespace Turrent_lib
             }
         }
 
-        public static int GetUnitAttackTargetScore(BattleCore _battle, bool _isMine, int _id, int _pos, int _turrentScore, int _baseScore)
+        public static int GetUnitAttackTargetScore(BattleCore _battleCore, bool _isMine, int _id, int _pos, int _turrentScore, int _baseScore)
         {
             int score = 0;
 
@@ -39,7 +39,7 @@ namespace Turrent_lib
 
                 ITurrentSDS turrentSDS = unitSDS.GetTurrent()[i];
 
-                List<int> result = GetTurrentAttackTargetList(_battle, _isMine, turrentSDS, pos);
+                List<int> result = GetTurrentAttackTargetList(_battleCore, _isMine, turrentSDS, pos);
 
                 if (result != null)
                 {
@@ -62,7 +62,7 @@ namespace Turrent_lib
             return score;
         }
 
-        public static List<int> GetTurrentAttackTargetList(BattleCore _battle, bool _isMine, ITurrentSDS _sds, int _pos)
+        public static List<int> GetTurrentAttackTargetList(BattleCore _battleCore, bool _isMine, ITurrentSDS _sds, int _pos)
         {
             List<int> result = null;
 
@@ -70,7 +70,7 @@ namespace Turrent_lib
 
             int oppX = BattleConst.MAP_WIDTH - 1 - x;
 
-            Turrent[] oppTurrent = _isMine ? _battle.oTurrent : _battle.mTurrent;
+            Turrent[] oppTurrent = _isMine ? _battleCore.oTurrent : _battleCore.mTurrent;
 
             for (int i = 0; i < _sds.GetAttackTargetPos().Length; i++)
             {
@@ -149,9 +149,9 @@ namespace Turrent_lib
             return result;
         }
 
-        public static List<int> GetNeighbourUnit(BattleCore _battle, Unit _unit)
+        public static List<int> GetNeighbourUnit(BattleCore _battleCore, Unit _unit)
         {
-            Turrent[] turrents = _unit.isMine ? _battle.mTurrent : _battle.oTurrent;
+            Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
             List<int> result = null;
 
