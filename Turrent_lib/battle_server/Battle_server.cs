@@ -318,14 +318,17 @@ namespace Turrent_lib
 
                             if (action.isMine)
                             {
-                                if (oList == null)
+                                if (action.uid < recordData.mCards.Length)
                                 {
-                                    oList = new List<KeyValuePair<bool, int>>();
+                                    if (oList == null)
+                                    {
+                                        oList = new List<KeyValuePair<bool, int>>();
+                                    }
+
+                                    oList.Add(new KeyValuePair<bool, int>(true, action.uid));
+
+                                    oCardsShowList.Add(action.uid);
                                 }
-
-                                oList.Add(new KeyValuePair<bool, int>(true, action.uid));
-
-                                oCardsShowList.Add(action.uid);
 
                                 if (recordData.mCards.Length > mCardsShowNum)
                                 {
@@ -341,14 +344,17 @@ namespace Turrent_lib
                             }
                             else
                             {
-                                if (mList == null)
+                                if (action.uid < recordData.oCards.Length)
                                 {
-                                    mList = new List<KeyValuePair<bool, int>>();
+                                    if (mList == null)
+                                    {
+                                        mList = new List<KeyValuePair<bool, int>>();
+                                    }
+
+                                    mList.Add(new KeyValuePair<bool, int>(false, action.uid));
+
+                                    mCardsShowList.Add(action.uid);
                                 }
-
-                                mList.Add(new KeyValuePair<bool, int>(false, action.uid));
-
-                                mCardsShowList.Add(action.uid);
 
                                 if (recordData.oCards.Length > oCardsShowNum)
                                 {

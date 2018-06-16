@@ -1,3 +1,5 @@
-ID,触发事件名,光环效果类型(0修正int 1施放技能 2赋值int),优先级,光环触发者,光环持续时间,效果目标,效果数据,删除事件
+ID,触发事件名,光环效果类型(0修正int 1施放技能 2赋值int 3乘以int),优先级,光环触发者,光环持续时间,效果目标,效果数据,删除事件
 int,string,int,int,int,int,int,int[],string[]
-ID,eventName,effectType,priority,trigger,time,effectTarget,effectData,removeEventNames
+ID,eventName,auraType,priority,trigger,time,effectTarget,effectData,removeEventNames
+1,fixDoPhysicDamage,0,,0,0,,50,
+2,fixDoPhysicDamage,0,,3,0,,50,

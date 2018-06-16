@@ -8,8 +8,8 @@ public class TurrentSDS_c {
         _csv.attackDamageAddMax = _br.ReadInt32();
         _csv.attackDamageType = _br.ReadInt32();
         _csv.attackGap = _br.ReadInt32();
-        _csv.cd = _br.ReadInt32();
         _csv.ID = _br.ReadInt32();
+        _csv.updateType = _br.ReadInt32();
         _csv.icon = _br.ReadString();
         int lengthattackSplashPos = _br.ReadInt32();
         _csv.attackSplashPos = new string[lengthattackSplashPos];

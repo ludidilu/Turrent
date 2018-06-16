@@ -2,11 +2,19 @@
 
 namespace Turrent_lib
 {
+    enum UnitState
+    {
+        CD,
+        FREE,
+    }
+
     public class Unit
     {
         public bool isMine;
 
         public IUnitSDS sds;
+
+        internal UnitState state { private set; get; }
 
         public int hp { private set; get; }
 
@@ -34,6 +42,8 @@ namespace Turrent_lib
 
             hp = sds.GetHp();
 
+            state = UnitState.CD;
+
             if (sds.GetLiveTime() > 0)
             {
                 dieTime = _time + sds.GetLiveTime();
@@ -55,6 +65,11 @@ namespace Turrent_lib
 
                 turrentList.Add(turrent);
             }
+        }
+
+        internal void Ready(int _time)
+        {
+            state = UnitState.FREE;
 
             for (int i = 0; i < sds.GetAuras().Length; i++)
             {

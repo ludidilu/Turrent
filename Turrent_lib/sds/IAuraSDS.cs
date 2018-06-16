@@ -38,7 +38,7 @@
     public interface IAuraSDS
     {
         string GetEventName();
-        AuraType GetEffectType();
+        AuraType GetAuraType();
         int GetPriority();
         AuraTrigger GetTrigger();
         int GetTime();

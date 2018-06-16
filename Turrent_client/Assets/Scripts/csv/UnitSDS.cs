@@ -5,6 +5,7 @@ public partial class UnitSDS : CsvBase, IUnitSDS
     public int[] row;
     public int[] pos;
     public int[] turrent;
+    public int cd;
     public int hp;
     public int cost;
     public int liveTime;
@@ -35,6 +36,11 @@ public partial class UnitSDS : CsvBase, IUnitSDS
         }
 
         return turrentFix;
+    }
+
+    public int GetCd()
+    {
+        return cd;
     }
 
     public int GetHp()

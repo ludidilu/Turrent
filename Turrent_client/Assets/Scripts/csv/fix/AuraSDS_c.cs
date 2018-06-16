@@ -1,8 +1,8 @@
 using System.IO;
 public class AuraSDS_c {
     public static void Init(AuraSDS _csv, BinaryReader _br){
+        _csv.auraType = _br.ReadInt32();
         _csv.effectTarget = _br.ReadInt32();
-        _csv.effectType = _br.ReadInt32();
         _csv.ID = _br.ReadInt32();
         _csv.priority = _br.ReadInt32();
         _csv.time = _br.ReadInt32();

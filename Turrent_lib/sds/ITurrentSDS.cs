@@ -8,9 +8,16 @@ namespace Turrent_lib
         MAGIC,
     }
 
+    public enum UpdateType
+    {
+        ALWAYS_UPDATE,
+        CD_UPDATE,
+        DO_NOT_UPDATE,
+    }
+
     public interface ITurrentSDS
     {
-        int GetCd();
+        UpdateType GetUpdateType();
         KeyValuePair<int, int>[][] GetAttackTargetPos();
         KeyValuePair<int, int>[][] GetAttackSplashPos();
         int GetAttackGap();

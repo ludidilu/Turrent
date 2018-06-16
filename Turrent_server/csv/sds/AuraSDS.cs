@@ -3,7 +3,7 @@
 public partial class AuraSDS : CsvBase, IAuraSDS
 {
     public string eventName;
-    public int effectType;
+    public int auraType;
     public int priority;
     public int trigger;
     public int time;
@@ -16,9 +16,9 @@ public partial class AuraSDS : CsvBase, IAuraSDS
         return eventName;
     }
 
-    public AuraType GetEffectType()
+    public AuraType GetAuraType()
     {
-        return (AuraType)effectType;
+        return (AuraType)auraType;
     }
 
     public int GetPriority()

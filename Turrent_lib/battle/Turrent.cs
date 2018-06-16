@@ -3,12 +3,6 @@ using System;
 
 namespace Turrent_lib
 {
-    enum TurrentState
-    {
-        CD,
-        FREE,
-    }
-
     public class Turrent
     {
         public Unit parent;
@@ -16,8 +10,6 @@ namespace Turrent_lib
         public ITurrentSDS sds;
 
         public int pos { private set; get; }
-
-        private TurrentState state;
 
         internal int time { private set; get; }
 
@@ -35,9 +27,7 @@ namespace Turrent_lib
 
             pos = _pos;
 
-            state = TurrentState.CD;
-
-            time = _time + sds.GetCd();
+            time = _time + _parent.sds.GetCd();
 
             if (sds.GetAttackDamageAdd() > 0)
             {
@@ -47,12 +37,12 @@ namespace Turrent_lib
 
         internal bool Update(out BattleAttackVO _vo)
         {
-            if (state == TurrentState.CD)
+            if (parent.state == UnitState.CD)
             {
-                state = TurrentState.FREE;
+                parent.Ready(time);
             }
 
-            bool b = Attack(out _vo);
+            bool b = DoAction(out _vo);
 
             if (b)
             {
@@ -62,7 +52,7 @@ namespace Turrent_lib
             return b;
         }
 
-        private bool Attack(out BattleAttackVO _vo)
+        private bool DoAction(out BattleAttackVO _vo)
         {
             Dictionary<KeyValuePair<int, int>, int> recDic = null;
 

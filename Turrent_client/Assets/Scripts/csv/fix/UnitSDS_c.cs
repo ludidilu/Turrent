@@ -1,6 +1,7 @@
 using System.IO;
 public class UnitSDS_c {
     public static void Init(UnitSDS _csv, BinaryReader _br){
+        _csv.cd = _br.ReadInt32();
         _csv.cost = _br.ReadInt32();
         _csv.hp = _br.ReadInt32();
         _csv.ID = _br.ReadInt32();

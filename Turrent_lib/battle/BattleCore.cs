@@ -291,9 +291,25 @@ namespace Turrent_lib
             {
                 Turrent turrent = mTurrent[i];
 
-                if (turrent != null && turrent.sds.GetAttackGap() > 0)
+                if (turrent != null)
                 {
-                    list.Add(turrent);
+                    switch (turrent.sds.GetUpdateType())
+                    {
+                        case UpdateType.ALWAYS_UPDATE:
+
+                            list.Add(turrent);
+
+                            break;
+
+                        case UpdateType.CD_UPDATE:
+
+                            if (turrent.parent.state == UnitState.CD)
+                            {
+                                list.Add(turrent);
+                            }
+
+                            break;
+                    }
                 }
             }
 
@@ -301,9 +317,25 @@ namespace Turrent_lib
             {
                 Turrent turrent = oTurrent[i];
 
-                if (turrent != null && turrent.sds.GetAttackGap() > 0)
+                if (turrent != null)
                 {
-                    list.Add(turrent);
+                    switch (turrent.sds.GetUpdateType())
+                    {
+                        case UpdateType.ALWAYS_UPDATE:
+
+                            list.Add(turrent);
+
+                            break;
+
+                        case UpdateType.CD_UPDATE:
+
+                            if (turrent.parent.state == UnitState.CD)
+                            {
+                                list.Add(turrent);
+                            }
+
+                            break;
+                    }
                 }
             }
 

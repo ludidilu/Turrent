@@ -15,6 +15,8 @@ namespace Turrent_lib
 
         internal static void Init(BattleCore _battleCore, Unit _unit, int _auraID, AuraRegisterType _registerType, int _nowTime)
         {
+            Log.Write("init aura:" + _auraID);
+
             IAuraSDS sds = BattleCore.GetAuraData(_auraID);
 
             List<int> ids = new List<int>();
@@ -77,12 +79,14 @@ namespace Turrent_lib
         {
             int result;
 
-            switch (_sds.GetEffectType())
+            switch (_sds.GetAuraType())
             {
                 case AuraType.ADD_INT:
 
                     SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerUnit, Unit _otherUnit)
                     {
+                        Log.Write("trigger aura!");
+
                         if (CheckAuraIsBeSilenced(_battleCore, _unit, _registerType) && CheckAuraTrigger(_battleCore, _unit, _triggerUnit, _sds))
                         {
                             _result += _sds.GetEffectData()[0];
@@ -159,7 +163,7 @@ namespace Turrent_lib
 
                 default:
 
-                    throw new Exception("Unknown AuraType:" + _sds.GetEffectType().ToString());
+                    throw new Exception("Unknown AuraType:" + _sds.GetAuraType().ToString());
             }
 
             return result;

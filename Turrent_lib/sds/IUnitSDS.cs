@@ -7,6 +7,7 @@
         ITurrentSDS[] GetTurrent();
         int GetHp();
         int GetCost();
+        int GetCd();
         int GetLiveTime();
         int[] GetAuras();
     }

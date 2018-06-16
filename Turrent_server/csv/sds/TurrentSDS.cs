@@ -3,7 +3,7 @@ using Turrent_lib;
 
 public partial class TurrentSDS : CsvBase, ITurrentSDS
 {
-    public int cd;
+    public int updateType;
     public string[] attackTargetPos;
     public string[] attackSplashPos;
     public int attackGap;
@@ -18,9 +18,9 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
     private KeyValuePair<int, int>[][] attackTargetPosFix;
     private KeyValuePair<int, int>[][] attackSplashPosFix;
 
-    public int GetCd()
+    public UpdateType GetUpdateType()
     {
-        return cd;
+        return (UpdateType)updateType;
     }
 
     public KeyValuePair<int, int>[][] GetAttackTargetPos()
