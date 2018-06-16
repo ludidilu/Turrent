@@ -110,7 +110,9 @@ public partial class BattleManager : MonoBehaviour
 
         Dictionary<int, TurrentSDS> turrentDic = StaticData.GetDic<TurrentSDS>();
 
-        BattleCore.Init(unitDic, turrentDic);
+        Dictionary<int, AuraSDS> auraDic = StaticData.GetDic<AuraSDS>();
+
+        BattleCore.Init(unitDic, turrentDic, auraDic);
 
         battle.Init(SendData, RefreshData, ClientUpdate);
 

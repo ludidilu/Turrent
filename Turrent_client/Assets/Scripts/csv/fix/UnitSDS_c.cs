@@ -4,6 +4,12 @@ public class UnitSDS_c {
         _csv.cost = _br.ReadInt32();
         _csv.hp = _br.ReadInt32();
         _csv.ID = _br.ReadInt32();
+        _csv.liveTime = _br.ReadInt32();
+        int lengthauras = _br.ReadInt32();
+        _csv.auras = new int[lengthauras];
+        for(int i = 0 ; i < lengthauras ; i++){
+            _csv.auras[i] = _br.ReadInt32();
+        }
         int lengthpos = _br.ReadInt32();
         _csv.pos = new int[lengthpos];
         for(int i = 0 ; i < lengthpos ; i++){

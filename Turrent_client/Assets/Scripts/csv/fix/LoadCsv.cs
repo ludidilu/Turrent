@@ -7,6 +7,15 @@ public class LoadCsv {
         MemoryStream ms = new MemoryStream(_bytes);
         BinaryReader br = new BinaryReader(ms);
         Dictionary<Type,IDictionary> dic = new Dictionary<Type,IDictionary>();
+        Dictionary<int,AuraSDS> AuraSDSDic = new Dictionary<int,AuraSDS>();
+        int lengthAuraSDS = br.ReadInt32();
+        for(int i = 0 ; i < lengthAuraSDS ; i++){
+            AuraSDS unit = new AuraSDS();
+            AuraSDS_c.Init(unit,br);
+            unit.Fix();
+            AuraSDSDic.Add(unit.ID,unit);
+        }
+        dic.Add(typeof(AuraSDS),AuraSDSDic);
         Dictionary<int,TurrentSDS> TurrentSDSDic = new Dictionary<int,TurrentSDS>();
         int lengthTurrentSDS = br.ReadInt32();
         for(int i = 0 ; i < lengthTurrentSDS ; i++){

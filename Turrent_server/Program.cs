@@ -61,13 +61,17 @@ namespace Turrent_server
 
             StaticData.Load<UnitSDS>("Unit");
 
+            StaticData.Load<AuraSDS>("Aura");
+
             StaticData.Load<BattleSDS>("Battle");
 
             Dictionary<int, TurrentSDS> turrendDic = StaticData.GetDic<TurrentSDS>();
 
             Dictionary<int, UnitSDS> unitDic = StaticData.GetDic<UnitSDS>();
 
-            BattleCore.Init(unitDic, turrendDic);
+            Dictionary<int, AuraSDS> auraDic = StaticData.GetDic<AuraSDS>();
+
+            BattleCore.Init(unitDic, turrendDic, auraDic);
 
             string summonStr = File.ReadAllText(ConfigDictionary.Instance.ai_path + "ai_summon.xml");
 

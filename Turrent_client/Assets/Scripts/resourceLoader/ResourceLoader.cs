@@ -98,6 +98,8 @@ public static class ResourceLoader
         StaticData.Load<UnitSDS>("Unit");
 
         StaticData.Load<TurrentSDS>("Turrent");
+
+        StaticData.Load<AuraSDS>("Aura");
     }
 
     private static void LoadPrefabs()

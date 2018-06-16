@@ -56,9 +56,9 @@ namespace Turrent_lib
                 turrentList.Add(turrent);
             }
 
-            for (int i = 0; i < sds.GetAura().Length; i++)
+            for (int i = 0; i < sds.GetAuras().Length; i++)
             {
-                Aura.Init(battleCore, this, sds.GetAura()[i], Aura.AuraRegisterType.AURA, _time);
+                Aura.Init(battleCore, this, sds.GetAuras()[i], Aura.AuraRegisterType.AURA, _time);
             }
         }
 

@@ -8,6 +8,6 @@
         int GetHp();
         int GetCost();
         int GetLiveTime();
-        int[] GetAura();
+        int[] GetAuras();
     }
 }

@@ -8,8 +8,8 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
     public string[] attackSplashPos;
     public int attackGap;
     public int attackDamage;
+    public int attackDamageType;
     public bool canAttackBase;
-    public int liveTime;
 
     public int attackDamageAdd;
     public int attackDamageAddMax;
@@ -111,14 +111,14 @@ public partial class TurrentSDS : CsvBase, ITurrentSDS
         return attackDamage;
     }
 
+    public DamageType GetAttackDamageType()
+    {
+        return (DamageType)attackDamageType;
+    }
+
     public bool GetCanAttackBase()
     {
         return canAttackBase;
-    }
-
-    public int GetLiveTime()
-    {
-        return liveTime;
     }
 
     public int GetAttackDamageAdd()

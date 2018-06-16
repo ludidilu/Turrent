@@ -7,6 +7,8 @@ public partial class UnitSDS : CsvBase, IUnitSDS
     public int[] turrent;
     public int hp;
     public int cost;
+    public int liveTime;
+    public int[] auras;
 
     private ITurrentSDS[] turrentFix;
 
@@ -43,5 +45,15 @@ public partial class UnitSDS : CsvBase, IUnitSDS
     public int GetCost()
     {
         return cost;
+    }
+
+    public int GetLiveTime()
+    {
+        return liveTime;
+    }
+
+    public int[] GetAuras()
+    {
+        return auras;
     }
 }
