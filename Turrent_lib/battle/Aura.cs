@@ -15,8 +15,6 @@ namespace Turrent_lib
 
         internal static void Init(BattleCore _battleCore, Unit _unit, int _auraID, AuraRegisterType _registerType, int _nowTime)
         {
-            Log.Write("init aura:" + _auraID);
-
             IAuraSDS sds = BattleCore.GetAuraData(_auraID);
 
             List<int> ids = new List<int>();
@@ -85,8 +83,6 @@ namespace Turrent_lib
 
                     SuperEventListener.SuperFunctionCallBackV2<int, Unit, Unit> dele1 = delegate (int _index, ref int _result, Unit _triggerUnit, Unit _otherUnit)
                     {
-                        Log.Write("trigger aura!");
-
                         if (CheckAuraIsBeSilenced(_battleCore, _unit, _registerType) && CheckAuraTrigger(_battleCore, _unit, _triggerUnit, _sds))
                         {
                             _result += _sds.GetEffectData()[0];
@@ -198,11 +194,154 @@ namespace Turrent_lib
 
                     return _triggerUnit.isMine != _unit.isMine;
 
+                case AuraTrigger.COL_ENEMY:
+
+                    if (_triggerUnit.isMine != _unit.isMine)
+                    {
+                        Turrent[] turrents = _triggerUnit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
+
+                        int x = _unit.pos % BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            if (posFix >= BattleConst.MAP_WIDTH)
+                            {
+                                return false;
+                            }
+
+                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+
+                            nowX = BattleConst.MAP_WIDTH - 1 - nowX;
+
+                            for (int m = 0; m < BattleConst.MAP_HEIGHT; m++)
+                            {
+                                int targetPos = m * BattleConst.MAP_WIDTH + nowX;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.FRONT_ENEMY:
+
+                    if (_triggerUnit.isMine != _unit.isMine)
+                    {
+                        Turrent[] turrents = _triggerUnit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
+
+                        int x = _unit.pos % BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            if (posFix >= BattleConst.MAP_WIDTH)
+                            {
+                                return false;
+                            }
+
+                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+
+                            nowX = BattleConst.MAP_WIDTH - 1 - nowX;
+
+                            for (int m = 0; m < BattleConst.MAP_HEIGHT; m++)
+                            {
+                                int targetPos = m * BattleConst.MAP_WIDTH + nowX;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null)
+                                {
+                                    if (turrent.parent == _triggerUnit)
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
+
                 case AuraTrigger.OWNER_NEIGHBOUR_ALLY:
 
-                    List<int> list = BattlePublicTools.GetNeighbourUnit(_battleCore, _unit);
+                    if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
+                    {
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
-                    return list.Contains(_triggerUnit.uid);
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowPos = _unit.pos + posFix;
+
+                            int nowX = nowPos % BattleConst.MAP_WIDTH;
+
+                            int targetPos;
+
+                            if (nowX > 0)
+                            {
+                                targetPos = nowPos - 1;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+
+                            if (nowX < BattleConst.MAP_WIDTH - 1)
+                            {
+                                targetPos = nowPos + 1;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+
+                            targetPos = nowPos - BattleConst.MAP_WIDTH;
+
+                            if (targetPos >= 0)
+                            {
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+
+                            targetPos = nowPos + BattleConst.MAP_WIDTH;
+
+                            if (targetPos < BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT)
+                            {
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
 
                 case AuraTrigger.OWNER_ALLY:
 
@@ -212,7 +351,7 @@ namespace Turrent_lib
 
                     if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
                     {
-                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
                         int y = _unit.pos / BattleConst.MAP_WIDTH;
 
@@ -220,25 +359,23 @@ namespace Turrent_lib
                         {
                             int posFix = _unit.sds.GetPos()[i];
 
-                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
-
-                            if (!dic.ContainsKey(nowY))
+                            if (posFix % BattleConst.MAP_WIDTH != 0)
                             {
-                                dic.Add(nowY, false);
+                                continue;
                             }
-                        }
-
-                        y = _triggerUnit.pos / BattleConst.MAP_WIDTH;
-
-                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
-                        {
-                            int posFix = _triggerUnit.sds.GetPos()[i];
 
                             int nowY = y + posFix / BattleConst.MAP_WIDTH;
 
-                            if (dic.ContainsKey(nowY))
+                            for (int m = 0; m < BattleConst.MAP_WIDTH; m++)
                             {
-                                return true;
+                                int targetPos = nowY * BattleConst.MAP_WIDTH + m;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -249,7 +386,7 @@ namespace Turrent_lib
 
                     if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
                     {
-                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
                         int x = _unit.pos % BattleConst.MAP_WIDTH;
 
@@ -257,25 +394,23 @@ namespace Turrent_lib
                         {
                             int posFix = _unit.sds.GetPos()[i];
 
-                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
-
-                            if (!dic.ContainsKey(nowX))
+                            if (posFix >= BattleConst.MAP_WIDTH)
                             {
-                                dic.Add(nowX, false);
+                                return false;
                             }
-                        }
-
-                        x = _triggerUnit.pos % BattleConst.MAP_WIDTH;
-
-                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
-                        {
-                            int posFix = _triggerUnit.sds.GetPos()[i];
 
                             int nowX = x + posFix % BattleConst.MAP_WIDTH;
 
-                            if (dic.ContainsKey(nowX))
+                            for (int m = 0; m < BattleConst.MAP_HEIGHT; m++)
                             {
-                                return true;
+                                int targetPos = m * BattleConst.MAP_WIDTH + nowX;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -286,36 +421,41 @@ namespace Turrent_lib
 
                     if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
                     {
-                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
-
-                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
                         for (int i = 0; i < _unit.sds.GetPos().Length; i++)
                         {
                             int posFix = _unit.sds.GetPos()[i];
 
-                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
-
-                            if (nowY >= BattleConst.MAP_WIDTH)
+                            if (posFix >= BattleConst.MAP_WIDTH)
                             {
-                                int pos = _unit.pos + posFix - BattleConst.MAP_WIDTH;
-
-                                if (!dic.ContainsKey(pos))
-                                {
-                                    dic.Add(pos, false);
-                                }
+                                return false;
                             }
-                        }
 
-                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
-                        {
-                            int posFix = _triggerUnit.sds.GetPos()[i];
+                            int nowPos = _unit.pos + posFix;
 
-                            int pos = _triggerUnit.pos + posFix;
-
-                            if (dic.ContainsKey(pos))
+                            for (int m = 1; m < BattleConst.MAP_HEIGHT; m++)
                             {
-                                return true;
+                                int targetPos = nowPos - m * BattleConst.MAP_WIDTH;
+
+                                if (targetPos < 0)
+                                {
+                                    break;
+                                }
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null)
+                                {
+                                    if (turrent.parent == _triggerUnit)
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -326,36 +466,41 @@ namespace Turrent_lib
 
                     if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
                     {
-                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
-
-                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
                         for (int i = 0; i < _unit.sds.GetPos().Length; i++)
                         {
                             int posFix = _unit.sds.GetPos()[i];
 
-                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
-
-                            if (nowY < BattleConst.MAP_HEIGHT - 1)
+                            if (posFix >= BattleConst.MAP_WIDTH)
                             {
-                                int pos = _unit.pos + posFix + BattleConst.MAP_WIDTH;
-
-                                if (!dic.ContainsKey(pos))
-                                {
-                                    dic.Add(pos, false);
-                                }
+                                return false;
                             }
-                        }
 
-                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
-                        {
-                            int posFix = _triggerUnit.sds.GetPos()[i];
+                            int nowPos = _unit.pos + posFix;
 
-                            int pos = _triggerUnit.pos + posFix;
-
-                            if (dic.ContainsKey(pos))
+                            for (int m = 1; m < BattleConst.MAP_HEIGHT; m++)
                             {
-                                return true;
+                                int targetPos = nowPos + m * BattleConst.MAP_WIDTH;
+
+                                if (targetPos >= BattleConst.MAP_WIDTH * BattleConst.MAP_HEIGHT)
+                                {
+                                    break;
+                                }
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null)
+                                {
+                                    if (turrent.parent == _triggerUnit)
+                                    {
+                                        return true;
+                                    }
+                                    else if (turrent.parent != _unit)
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -366,44 +511,102 @@ namespace Turrent_lib
 
                     if (_triggerUnit != _unit && _triggerUnit.isMine == _unit.isMine)
                     {
-                        Dictionary<int, bool> dic = new Dictionary<int, bool>();
-
-                        int x = _unit.pos % BattleConst.MAP_WIDTH;
+                        Turrent[] turrents = _unit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
 
                         for (int i = 0; i < _unit.sds.GetPos().Length; i++)
                         {
                             int posFix = _unit.sds.GetPos()[i];
 
-                            int nowX = x + posFix % BattleConst.MAP_WIDTH;
+                            int nowPos = _unit.pos + posFix;
+
+                            int nowX = nowPos % BattleConst.MAP_WIDTH;
 
                             if (nowX > 0)
                             {
-                                int pos = _unit.pos + posFix - 1;
+                                int targetPos = nowPos - 1;
 
-                                if (!dic.ContainsKey(pos))
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
                                 {
-                                    dic.Add(pos, false);
+                                    return true;
                                 }
                             }
 
                             if (nowX < BattleConst.MAP_WIDTH - 1)
                             {
-                                int pos = _unit.pos + posFix + 1;
+                                int targetPos = nowPos + 1;
 
-                                if (!dic.ContainsKey(pos))
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
                                 {
-                                    dic.Add(pos, false);
+                                    return true;
                                 }
                             }
                         }
+                    }
 
-                        for (int i = 0; i < _triggerUnit.sds.GetPos().Length; i++)
+                    return false;
+
+                case AuraTrigger.ROW_ENEMY:
+
+                    if (_triggerUnit.isMine != _unit.isMine)
+                    {
+                        Turrent[] turrents = _triggerUnit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
+
+                        int y = _unit.pos / BattleConst.MAP_WIDTH;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
                         {
-                            int posFix = _triggerUnit.sds.GetPos()[i];
+                            int posFix = _unit.sds.GetPos()[i];
 
-                            int pos = _triggerUnit.pos + posFix;
+                            if (posFix % BattleConst.MAP_WIDTH != 0)
+                            {
+                                continue;
+                            }
 
-                            if (dic.ContainsKey(pos))
+                            int nowY = y + posFix / BattleConst.MAP_WIDTH;
+
+                            for (int m = 0; m < BattleConst.MAP_WIDTH; m++)
+                            {
+                                int targetPos = nowY * BattleConst.MAP_WIDTH + m;
+
+                                Turrent turrent = turrents[targetPos];
+
+                                if (turrent != null && turrent.parent == _triggerUnit)
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case AuraTrigger.POS_ENEMY:
+
+                    if (_triggerUnit.isMine != _unit.isMine)
+                    {
+                        Turrent[] turrents = _triggerUnit.isMine ? _battleCore.mTurrent : _battleCore.oTurrent;
+
+                        for (int i = 0; i < _unit.sds.GetPos().Length; i++)
+                        {
+                            int posFix = _unit.sds.GetPos()[i];
+
+                            int nowPos = _unit.pos + posFix;
+
+                            int nowX = nowPos % BattleConst.MAP_WIDTH;
+
+                            int nowY = nowPos / BattleConst.MAP_WIDTH;
+
+                            nowPos = BattleConst.MAP_WIDTH - 1 - nowPos;
+
+                            int targetPos = nowY * BattleConst.MAP_WIDTH + nowX;
+
+                            Turrent turrent = turrents[targetPos];
+
+                            if (turrent != null && turrent.parent == _triggerUnit)
                             {
                                 return true;
                             }

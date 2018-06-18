@@ -19,6 +19,10 @@
         OWNER_BACK_ALLY,
         OWNER_BESIDE_ALLY,
         ENEMY,
+        COL_ENEMY,
+        FRONT_ENEMY,
+        ROW_ENEMY,
+        POS_ENEMY,
     }
 
     public enum AuraTarget
