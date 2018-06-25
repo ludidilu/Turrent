@@ -25,22 +25,19 @@ public class TurrentCreater : MonoBehaviour
     private GameObject deleteBt;
 
     [SerializeField]
-    private InputField cd;
-
-    [SerializeField]
     private InputField attackGap;
 
     [SerializeField]
     private InputField attackDamage;
 
     [SerializeField]
-    private InputField liveTime;
-
-    [SerializeField]
-    private Text score;
+    private Toggle attackDamageType;
 
     [SerializeField]
     private Toggle canAttackBase;
+
+    [SerializeField]
+    private Text score;
 
     [SerializeField]
     private BattleMouseDownGo outputBg;
@@ -63,13 +60,9 @@ public class TurrentCreater : MonoBehaviour
 
         superList.CellClickIndexHandle = Choose;
 
-        cd.onValueChanged.AddListener(ValueChange);
-
         attackGap.onValueChanged.AddListener(ValueChange);
 
         attackDamage.onValueChanged.AddListener(ValueChange);
-
-        liveTime.onValueChanged.AddListener(ValueChange);
 
         canAttackBase.onValueChanged.AddListener(ValueChange);
 
@@ -95,13 +88,9 @@ public class TurrentCreater : MonoBehaviour
 
     public void GetScore()
     {
-        int cdValue = string.IsNullOrEmpty(cd.text) ? 0 : int.Parse(cd.text);
-
         int attackGapValue = string.IsNullOrEmpty(attackGap.text) ? 0 : int.Parse(attackGap.text);
 
         int attackDamageValue = string.IsNullOrEmpty(attackDamage.text) ? 0 : int.Parse(attackDamage.text);
-
-        int liveTimeValue = string.IsNullOrEmpty(liveTime.text) ? 0 : int.Parse(liveTime.text);
 
         if (attackGapValue == 0 || attackDamageValue == 0)
         {
@@ -141,21 +130,7 @@ public class TurrentCreater : MonoBehaviour
             {
                 int scoreValue;
 
-                if (liveTimeValue == 0)
-                {
-                    scoreValue = (int)(targetNum * attackDamageValue * (((float)scoreTimeLong - cdValue) / attackGapValue));
-                }
-                else
-                {
-                    if (liveTimeValue == cdValue)
-                    {
-                        scoreValue = (int)(targetNum * attackDamageValue * ((float)scoreTimeLong - cdValue) / scoreTimeLong);
-                    }
-                    else
-                    {
-                        scoreValue = (int)(targetNum * attackDamageValue * ((int.Parse(liveTime.text) - cdValue) / attackGapValue));
-                    }
-                }
+                scoreValue = (int)(targetNum * attackDamageValue * ((float)scoreTimeLong / attackGapValue));
 
                 score.text = scoreValue.ToString();
             }
@@ -262,7 +237,7 @@ public class TurrentCreater : MonoBehaviour
             splashStr = "^";
         }
 
-        string result = targetStr + "," + splashStr + "," + (string.IsNullOrEmpty(cd.text) ? "0" : cd.text) + "," + (string.IsNullOrEmpty(liveTime.text) ? "0" : liveTime.text) + "," + (string.IsNullOrEmpty(attackGap.text) ? "0" : attackGap.text) + "," + (string.IsNullOrEmpty(attackDamage.text) ? "0" : attackDamage.text) + "," + (canAttackBase.isOn ? "1" : "0") + "," + score.text;
+        string result = targetStr + "," + splashStr + "," + (string.IsNullOrEmpty(attackGap.text) ? "0" : attackGap.text) + "," + (string.IsNullOrEmpty(attackDamage.text) ? "0" : attackDamage.text) + "," + (attackDamageType.isOn ? "1" : "0") + "," + (canAttackBase.isOn ? "1" : "0") + "," + score.text;
 
         outputBg.gameObject.SetActive(true);
 
